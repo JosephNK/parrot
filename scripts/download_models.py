@@ -63,15 +63,15 @@ def download_model(
         return False
 
 
-def download_recommended_models(
+def download_supported_models(
     save_dir: Optional[str] = None, auth_token: Optional[str] = None
 ) -> None:
-    """추천 모델들 일괄 다운로드"""
+    """지원 모델들 일괄 다운로드"""
 
     models = KoreanJapaneseTranslator.list_models()
     success_count = 0
 
-    print("🚀 Downloading recommended translation models...")
+    print("🚀 Downloading supported translation models...")
     print(f"📋 Models to download: {len(models)}")
 
     for model_key, model_name in models.items():
@@ -107,26 +107,26 @@ def test_model(model_name: str, auth_token: Optional[str] = None) -> None:
 
         # 테스트 문장들
         test_cases = [
-            ("안녕하세요", "ko_to_ja"),
-            ("오늘 날씨가 좋네요", "ko_to_ja"),
+            ("안녕하세요", "ko2ja"),
+            ("오늘 날씨가 좋네요", "ko2ja"),
         ]
 
         # HyperCLOVAX 모델의 경우 일본어→한국어도 테스트
         if "hyperclova" not in model_name.lower():
             test_cases.extend(
                 [
-                    ("こんにちは", "ja_to_ko"),
-                    ("今日はいい天気ですね", "ja_to_ko"),
+                    ("こんにちは", "ja2ko"),
+                    ("今日はいい天気ですね", "ja2ko"),
                 ]
             )
 
         for text, direction in test_cases:
             try:
-                if direction == "ko_to_ja":
-                    result = translator.ko_to_ja(text)
+                if direction == "ko2ja":
+                    result = translator.ko2ja(text)
                     print(f"🇰🇷 → 🇯🇵: {text} → {result}")
                 else:
-                    result = translator.ja_to_ko(text)
+                    result = translator.ja2ko(text)
                     print(f"🇯🇵 → 🇰🇷: {text} → {result}")
             except Exception as e:
                 print(f"❌ Translation error: {e}")
@@ -181,7 +181,7 @@ def main():
 
     # 모든 모델 다운로드
     if args.all:
-        download_recommended_models(args.save_dir, auth_token)
+        download_supported_models(args.save_dir, auth_token)
         return
 
     # 특정 모델 다운로드

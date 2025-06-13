@@ -5,26 +5,17 @@ Korean-Japanese Translator Module
 """
 
 from typing import Optional, List, Dict, Any
-from .models import (
+from .model import (
     TranslationModel,
     NLLBTranslationModel,
     OpusTranslationModel,
     HyperCLOVAXTranslationModel,
 )
+from .config import config
 
 
 class KoreanJapaneseTranslator:
     """한국어-일본어 번역기"""
-
-    # 추천 모델들
-    RECOMMENDED_MODELS = {
-        "nllb-200": "facebook/nllb-200-distilled-600M",
-        "mbart-50": "facebook/mbart-large-50-many-to-many-mmt",
-        "opus-ko-ja": "Helsinki-NLP/opus-mt-ko-jap",
-        "opus-ja-ko": "Helsinki-NLP/opus-mt-jap-ko",
-        "hyperclova-0.5b": "naver-hyperclovax/HyperCLOVAX-SEED-Text-Instruct-0.5B",
-        "hyperclova-1.5b": "naver-hyperclovax/HyperCLOVAX-SEED-Text-Instruct-1.5B",
-    }
 
     def __init__(
         self,
@@ -39,9 +30,9 @@ class KoreanJapaneseTranslator:
             auto_load: 초기화 시 자동으로 모델 로드
         """
         if model_name is None:
-            model_name = self.RECOMMENDED_MODELS["nllb-200"]
-        elif model_name in self.RECOMMENDED_MODELS:
-            model_name = self.RECOMMENDED_MODELS[model_name]
+            model_name = config.SUPPORTED_MODELS["nllb-200"]
+        elif model_name in config.SUPPORTED_MODELS:
+            model_name = config.SUPPORTED_MODELS[model_name]
 
         # 모델 타입에 따라 적절한 클래스 선택
         if "nllb" in model_name.lower():
@@ -57,7 +48,7 @@ class KoreanJapaneseTranslator:
         if auto_load:
             self.model.load_model()
 
-    def ko_to_ja(self, text: str, **kwargs) -> str:
+    def ko2ja(self, text: str, **kwargs) -> str:
         """
         한국어 → 일본어 번역
 
@@ -72,7 +63,7 @@ class KoreanJapaneseTranslator:
             text=text, source_lang="korean", target_lang="japanese", **kwargs
         )
 
-    def ja_to_ko(self, text: str, **kwargs) -> str:
+    def ja2ko(self, text: str, **kwargs) -> str:
         """
         일본어 → 한국어 번역
 
@@ -110,11 +101,11 @@ class KoreanJapaneseTranslator:
             results.append(result)
         return results
 
-    def ko_to_ja_batch(self, texts: List[str], **kwargs) -> List[str]:
+    def ko2ja_batch(self, texts: List[str], **kwargs) -> List[str]:
         """한국어 → 일본어 배치 번역"""
         return self.translate_batch(texts, "korean", "japanese", **kwargs)
 
-    def ja_to_ko_batch(self, texts: List[str], **kwargs) -> List[str]:
+    def ja2ko_batch(self, texts: List[str], **kwargs) -> List[str]:
         """일본어 → 한국어 배치 번역"""
         return self.translate_batch(texts, "japanese", "korean", **kwargs)
 
@@ -180,11 +171,11 @@ class KoreanJapaneseTranslator:
                 print("번역 중...")
                 try:
                     if command == "ko":
-                        result = self.ko_to_ja(text)
+                        result = self.ko2ja(text)
                         print(f"한국어: {text}")
                         print(f"일본어: {result}")
                     else:
-                        result = self.ja_to_ko(text)
+                        result = self.ja2ko(text)
                         print(f"일본어: {text}")
                         print(f"한국어: {result}")
                 except Exception as e:
@@ -203,13 +194,13 @@ class KoreanJapaneseTranslator:
         return {
             **model_info,
             "supported_directions": ["Korean → Japanese", "Japanese → Korean"],
-            "recommended_models": self.RECOMMENDED_MODELS,
+            "supported_models": config.SUPPORTED_MODELS,
         }
 
     @classmethod
     def list_models(cls) -> Dict[str, str]:
         """사용 가능한 모델 목록 반환"""
-        return cls.RECOMMENDED_MODELS.copy()
+        return config.SUPPORTED_MODELS.copy()
 
 
 class MultiLanguageTranslator:

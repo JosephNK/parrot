@@ -29,6 +29,23 @@ class Config:
     # 디바이스 설정
     FORCE_CPU: bool = os.getenv("FORCE_CPU", "false").lower() == "true"
 
+    # 지원 모델 목록
+    SUPPORTED_MODELS = {
+        "nllb-200": "facebook/nllb-200-distilled-600M",
+        "mbart-50": "facebook/mbart-large-50-many-to-many-mmt",
+        "opus-ko-ja": "Helsinki-NLP/opus-mt-ko-jap",
+        "opus-ja-ko": "Helsinki-NLP/opus-mt-jap-ko",
+        "hyperclova-0.5b": "naver-hyperclovax/HyperCLOVAX-SEED-Text-Instruct-0.5B",
+        "hyperclova-1.5b": "naver-hyperclovax/HyperCLOVAX-SEED-Text-Instruct-1.5B",
+    }
+
+    # 지원하는 언어 코드
+    LANGUAGE_CODES = {
+        "korean": "kor_Hang",
+        "japanese": "jpn_Jpan",
+        "english": "eng_Latn",
+    }
+
     @classmethod
     def get_huggingface_token(cls) -> Optional[str]:
         """Hugging Face 토큰 반환"""

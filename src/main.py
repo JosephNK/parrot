@@ -16,7 +16,7 @@ from typing import List, Dict, Any
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root / "src"))
 
-from translator import KoreanJapaneseTranslator, TranslationModel
+from translator import KoreanJapaneseTranslator
 
 
 def demo_translation() -> None:
@@ -52,7 +52,7 @@ def demo_translation() -> None:
         print("-" * 30)
         for ko_text in test_sentences["korean"]:
             start_time = time.time()
-            ja_result = translator.ko_to_ja(ko_text)
+            ja_result = translator.ko2ja(ko_text)
             translate_time = time.time() - start_time
 
             print(f"KO: {ko_text}")
@@ -65,7 +65,7 @@ def demo_translation() -> None:
         print("-" * 30)
         for ja_text in test_sentences["japanese"]:
             start_time = time.time()
-            ko_result = translator.ja_to_ko(ja_text)
+            ko_result = translator.ja2ko(ja_text)
             translate_time = time.time() - start_time
 
             print(f"JA: {ja_text}")
@@ -79,7 +79,7 @@ def demo_translation() -> None:
         batch_ko = ["안녕", "감사합니다", "잘 지내세요"]
 
         start_time = time.time()
-        batch_ja_results = translator.ko_to_ja_batch(batch_ko)
+        batch_ja_results = translator.ko2ja_batch(batch_ko)
         batch_time = time.time() - start_time
 
         for ko, ja in zip(batch_ko, batch_ja_results):
@@ -163,11 +163,11 @@ def interactive_mode() -> None:
 
                 try:
                     if command == "ko":
-                        result = translator.ko_to_ja(text)
+                        result = translator.ko2ja(text)
                         print(f"한국어: {text}")
                         print(f"일본어: {result}")
                     else:
-                        result = translator.ja_to_ko(text)
+                        result = translator.ja2ko(text)
                         print(f"일본어: {text}")
                         print(f"한국어: {result}")
 
@@ -201,14 +201,15 @@ def benchmark_models() -> None:
     # 테스트할 모델들
     models_to_test = [
         ("NLLB-200", "facebook/nllb-200-distilled-600M"),
-        ("HyperCLOVA-0.5B", "naver-hyperclovax/HyperCLOVAX-SEED-Text-Instruct-0.5B"),
         ("Opus KO-JA", "Helsinki-NLP/opus-mt-ko-jap"),
         ("Opus JA-KO", "Helsinki-NLP/opus-mt-jap-ko"),
+        ("HyperCLOVA-0.5B", "naver-hyperclovax/HyperCLOVAX-SEED-Text-Instruct-0.5B"),
+        ("HyperCLOVA-1.5B", "naver-hyperclovax/HyperCLOVAX-SEED-Text-Instruct-1.5B"),
     ]
 
     test_sentences = [
-        ("한국어", "안녕하세요. 오늘 날씨가 좋네요.", "ko_to_ja"),
-        ("일본어", "こんにちは。今日はいい天気ですね。", "ja_to_ko"),
+        ("한국어", "안녕하세요. 오늘 날씨가 좋네요.", "ko2ja"),
+        ("일본어", "こんにちは。今日はいい天気ですね。", "ja2ko"),
     ]
 
     results = []
@@ -227,9 +228,9 @@ def benchmark_models() -> None:
                 load_time = time.time() - load_start
 
                 for lang, sentence, direction in test_sentences:
-                    if direction == "ko_to_ja":
+                    if direction == "ko2ja":
                         start_time = time.time()
-                        result = translator.ko_to_ja(sentence)
+                        result = translator.ko2ja(sentence)
                         translate_time = time.time() - start_time
 
                         print(f"{lang}: {sentence}")
@@ -256,9 +257,9 @@ def benchmark_models() -> None:
                 load_time = time.time() - load_start
 
                 for lang, sentence, direction in test_sentences:
-                    if direction == "ja_to_ko":
+                    if direction == "ja2ko":
                         start_time = time.time()
-                        result = translator.ja_to_ko(sentence)
+                        result = translator.ja2ko(sentence)
                         translate_time = time.time() - start_time
 
                         print(f"{lang}: {sentence}")
@@ -287,10 +288,10 @@ def benchmark_models() -> None:
                 for lang, sentence, direction in test_sentences:
                     start_time = time.time()
 
-                    if direction == "ko_to_ja":
-                        result = translator.ko_to_ja(sentence)
+                    if direction == "ko2ja":
+                        result = translator.ko2ja(sentence)
                     else:
-                        result = translator.ja_to_ko(sentence)
+                        result = translator.ja2ko(sentence)
 
                     translate_time = time.time() - start_time
 
@@ -343,16 +344,16 @@ def custom_translation(text: str, direction: str, model: str = None) -> None:
 
         translate_start = time.time()
 
-        if direction.lower() == "ko_to_ja":
-            result = translator.ko_to_ja(text)
+        if direction.lower() == "ko2ja":
+            result = translator.ko2ja(text)
             print(f"🇰🇷 Korean: {text}")
             print(f"🇯🇵 Japanese: {result}")
-        elif direction.lower() == "ja_to_ko":
-            result = translator.ja_to_ko(text)
+        elif direction.lower() == "ja2ko":
+            result = translator.ja2ko(text)
             print(f"🇯🇵 Japanese: {text}")
             print(f"🇰🇷 Korean: {result}")
         else:
-            print("❌ Invalid direction. Use 'ko_to_ja' or 'ja_to_ko'")
+            print("❌ Invalid direction. Use 'ko2ja' or 'ja2ko'")
             return
 
         translate_time = time.time() - translate_start
@@ -385,7 +386,7 @@ def show_model_info() -> None:
         print(f"Directions: {', '.join(info['supported_directions'])}")
 
         print("\n📋 Available Models:")
-        for key, model_name in info["recommended_models"].items():
+        for key, model_name in info["supported_models"].items():
             print(f"  {key}: {model_name}")
 
     except Exception as e:
@@ -427,7 +428,7 @@ def performance_test(model_name: str = None) -> None:
 
         for desc, text in test_cases:
             start_time = time.time()
-            result = translator.ko_to_ja(text)
+            result = translator.ko2ja(text)
             end_time = time.time()
 
             duration = end_time - start_time
@@ -465,7 +466,7 @@ def main():
 Examples:
   %(prog)s --demo                           # Run translation demo
   %(prog)s --interactive                    # Interactive translation mode
-  %(prog)s --translate "안녕하세요" ko_to_ja   # Translate specific text
+  %(prog)s --translate "안녕하세요" ko2ja      # Translate specific text
   %(prog)s --benchmark                      # Compare different models
   %(prog)s --info                           # Show model information
   %(prog)s --performance                    # Run performance test
@@ -484,7 +485,7 @@ Examples:
         "--translate",
         nargs=2,
         metavar=("TEXT", "DIRECTION"),
-        help="Translate text (direction: ko_to_ja or ja_to_ko)",
+        help="Translate text (direction: ko2ja or ja2ko)",
     )
 
     parser.add_argument(
