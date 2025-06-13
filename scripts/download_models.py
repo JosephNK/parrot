@@ -15,7 +15,7 @@ from typing import List, Optional
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root / "src"))
 
-from translator.models import TranslationModel
+from translator.model import TranslationModel
 from translator.translator import KoreanJapaneseTranslator
 from translator.config import config
 
@@ -41,7 +41,7 @@ def download_model(
         # 모델 타입에 따라 다른 클래스 사용
         if "hyperclova" in model_name.lower():
             # HyperCLOVAX 모델은 CausalLM
-            from translator.models import HyperCLOVAXTranslationModel
+            from translator.model import HyperCLOVAXTranslationModel
 
             model = HyperCLOVAXTranslationModel(model_name, auth_token)
         else:

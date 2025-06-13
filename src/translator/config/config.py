@@ -26,9 +26,6 @@ class Config:
     MAX_LENGTH: int = int(os.getenv("MAX_LENGTH", "128"))
     NUM_BEAMS: int = int(os.getenv("NUM_BEAMS", "5"))
 
-    # 디바이스 설정
-    FORCE_CPU: bool = os.getenv("FORCE_CPU", "false").lower() == "true"
-
     # 지원 모델 목록
     SUPPORTED_MODELS = {
         "nllb-200": "facebook/nllb-200-distilled-600M",
@@ -71,7 +68,6 @@ class Config:
         print(f"  Cache Directory: {cls.CACHE_DIR}")
         print(f"  Max Length: {cls.MAX_LENGTH}")
         print(f"  Num Beams: {cls.NUM_BEAMS}")
-        print(f"  Force CPU: {cls.FORCE_CPU}")
 
         token_status = "✅ Set" if cls.HUGGINGFACE_HUB_TOKEN else "❌ Not set"
         print(f"  HF Token: {token_status}")
