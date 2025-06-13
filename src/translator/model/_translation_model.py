@@ -7,7 +7,7 @@ import os
 import torch
 from abc import ABC, abstractmethod
 from typing import Optional, Dict, Any
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+from transformers import AutoTokenizer
 from huggingface_hub import login
 from ..config import config
 
@@ -32,20 +32,69 @@ class TranslationModel(ABC):
         elif config.get_huggingface_token():
             login(token=config.get_huggingface_token())
 
-    @abstractmethod
-    def load_model(self, **kwargs) -> None:
-        """
-        Load the translation model.
+    def load_model_seq2seqlm(self, **kwargs) -> None:
+        """모델 로드"""
+        print(f"Loading model: {self.model_name}")
+        print(f"Using device: {self.device}")
 
-        This method must be implemented by all subclasses.
+        try:
+            from transformers import AutoModelForSeq2SeqLM
 
-        Args:
-            **kwargs: Additional arguments that might be needed for loading specific models
+            # 토크나이저 로드
+            self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+            print("✓ Tokenizer loaded")
 
-        Returns:
-            None
-        """
-        pass
+            # 모델 로드
+            model_kwargs = {
+                "torch_dtype": torch.float16 if self.device != "cpu" else torch.float32,
+                **kwargs,
+            }
+
+            self.model = AutoModelForSeq2SeqLM.from_pretrained(
+                self.model_name, **model_kwargs
+            )
+
+            # 디바이스로 이동
+            if self.device != "cpu":
+                self.model = self.model.to(self.device)
+
+            print("✓ Model loaded successfully!")
+
+        except Exception as e:
+            print(f"✗ Error loading model: {e}")
+            raise
+
+    def load_model_causallm(self, **kwargs) -> None:
+        """모델 로드"""
+        print(f"Loading model: {self.model_name}")
+        print(f"Using device: {self.device}")
+
+        try:
+            from transformers import AutoModelForCausalLM
+
+            # 토크나이저 로드
+            self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+            print("✓ Tokenizer loaded")
+
+            # CausalLM 모델 로드
+            model_kwargs = {
+                "torch_dtype": torch.float16 if self.device != "cpu" else torch.float32,
+                **kwargs,
+            }
+
+            self.model = AutoModelForCausalLM.from_pretrained(
+                self.model_name, **model_kwargs
+            )
+
+            # 디바이스로 이동
+            if self.device != "cpu":
+                self.model = self.model.to(self.device)
+
+            print("✓ Model loaded successfully!")
+
+        except Exception as e:
+            print(f"✗ Error loading HyperCLOVAX model: {e}")
+            raise
 
     @abstractmethod
     def translate(self, text, source_lang, target_lang):

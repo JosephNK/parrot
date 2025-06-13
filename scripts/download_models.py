@@ -44,11 +44,11 @@ def download_model(
             from translator.model import HyperCLOVAXTranslationModel
 
             model = HyperCLOVAXTranslationModel(model_name, auth_token)
+            model.load_model_causallm()
         else:
             # 기존 번역 모델들은 Seq2SeqLM
             model = TranslationModel(model_name, auth_token)
-
-        model.load_model()
+            model.load_model_seq2seqlm()
 
         # 로컬 저장 (선택사항)
         if save_path:

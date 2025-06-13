@@ -19,38 +19,6 @@ class HyperCLOVAXTranslationModel(TranslationModel):
         """HyperCLOVAX 모델 초기화"""
         super().__init__(model_name, auth_token)
 
-    def load_model(self, **kwargs) -> None:
-        """HyperCLOVAX 모델 로드"""
-        print(f"Loading HyperCLOVAX model: {self.model_name}")
-        print(f"Using device: {self.device}")
-
-        try:
-            from transformers import AutoModelForCausalLM
-
-            # 토크나이저 로드
-            self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-            print("✓ Tokenizer loaded")
-
-            # CausalLM 모델 로드
-            model_kwargs = {
-                "torch_dtype": torch.float16 if self.device != "cpu" else torch.float32,
-                **kwargs,
-            }
-
-            self.model = AutoModelForCausalLM.from_pretrained(
-                self.model_name, **model_kwargs
-            )
-
-            # 디바이스로 이동
-            if self.device != "cpu":
-                self.model = self.model.to(self.device)
-
-            print("✓ HyperCLOVAX model loaded successfully!")
-
-        except Exception as e:
-            print(f"✗ Error loading HyperCLOVAX model: {e}")
-            raise
-
     def translate(
         self,
         text: str,
