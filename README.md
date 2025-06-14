@@ -79,7 +79,7 @@ Response:
 
 ### Environment Information
 - **Hardware**: Macbook M3
-- **Model**: hyperclova-1.5b (Safetensors)
+- **Model**: hyperclova-1.5b
 - **Description**: `Safetensors` A new file format for storing machine learning model weights.
 
 Request:
