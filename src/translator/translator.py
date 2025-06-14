@@ -6,8 +6,8 @@ Korean-Japanese Translator Module
 
 from typing import Optional, List, Dict, Any
 from .model import (
-    TranslationModel,
     NLLBTranslationModel,
+    MBartTranslationModel,
     OpusTranslationModel,
     HyperCLOVAXTranslationModel,
 )
@@ -37,13 +37,12 @@ class KoreanJapaneseTranslator:
         # 모델 타입에 따라 적절한 클래스 선택
         if "nllb" in model_name.lower():
             self.model = NLLBTranslationModel(model_name, auth_token)
+        elif "mbart" in model_name.lower():
+            self.model = MBartTranslationModel(model_name, auth_token)
         elif "opus" in model_name.lower():
             self.model = OpusTranslationModel(model_name, auth_token)
         elif "hyperclova" in model_name.lower():
             self.model = HyperCLOVAXTranslationModel(model_name, auth_token)
-        else:
-            # 기본값으로 NLLB 사용
-            self.model = NLLBTranslationModel(model_name, auth_token)
 
         if auto_load:
             self.model.load_model()
@@ -201,30 +200,3 @@ class KoreanJapaneseTranslator:
     def list_models(cls) -> Dict[str, str]:
         """사용 가능한 모델 목록 반환"""
         return config.SUPPORTED_MODELS.copy()
-
-
-class MultiLanguageTranslator:
-    """다국어 번역기 (확장용)"""
-
-    def __init__(self, model_name: str = "facebook/nllb-200-distilled-600M"):
-        """
-        Args:
-            model_name: 다국어 지원 모델 이름
-        """
-        self.model = TranslationModel(model_name)
-        self.model.load_model()
-
-    def translate(self, text: str, source_lang: str, target_lang: str, **kwargs) -> str:
-        """
-        다국어 번역
-
-        Args:
-            text: 번역할 텍스트
-            source_lang: 소스 언어 (korean, japanese, english)
-            target_lang: 타겟 언어 (korean, japanese, english)
-            **kwargs: 추가 옵션
-
-        Returns:
-            번역 결과
-        """
-        return self.model.translate(text, source_lang, target_lang, **kwargs)

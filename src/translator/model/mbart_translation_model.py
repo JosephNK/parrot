@@ -1,5 +1,5 @@
 """
-NLLB Model Module
+MBart Model Module
 
 """
 
@@ -11,8 +11,8 @@ from ._translation_model import TranslationModel
 from ..config import config
 
 
-class NLLBTranslationModel(TranslationModel):
-    """NLLB 모델 전용 클래스"""
+class MBartTranslationModel(TranslationModel):
+    """MBart 모델 전용 클래스"""
 
     def __init__(self, model_name: str, auth_token: Optional[str] = None):
         super().__init__(model_name, auth_token)
@@ -47,7 +47,7 @@ class NLLBTranslationModel(TranslationModel):
         print(f"✓ Translating from '{source_code}' to '{target_code}'...")
 
         try:
-            # NLLB 모델은 src_lang을 토크나이저 속성으로 설정
+            # MBart 모델은 src_lang을 토크나이저 속성으로 설정
             self.tokenizer.src_lang = source_code
             inputs = self.tokenizer(text, return_tensors="pt")
 
@@ -59,9 +59,7 @@ class NLLBTranslationModel(TranslationModel):
             with torch.no_grad():
                 outputs = self.model.generate(
                     inputs["input_ids"],
-                    forced_bos_token_id=self.tokenizer.convert_tokens_to_ids(
-                        target_code
-                    ),
+                    forced_bos_token_id=self.tokenizer.lang_code_to_id[target_code],
                     max_length=max_length,
                     num_beams=num_beams,
                     early_stopping=True,

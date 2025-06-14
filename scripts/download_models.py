@@ -9,13 +9,13 @@ import os
 import sys
 import argparse
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
+from translator.model import LoaderModel
 
 # 프로젝트 루트를 Python path에 추가
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root / "src"))
 
-from translator.model import TranslationModel
 from translator.translator import KoreanJapaneseTranslator
 from translator.config import config
 
@@ -38,17 +38,8 @@ def download_model(
         print(f"\n📥 Downloading model: {model_name}")
         print("-" * 50)
 
-        # 모델 타입에 따라 다른 클래스 사용
-        if "hyperclova" in model_name.lower():
-            # HyperCLOVAX 모델은 CausalLM
-            from translator.model import HyperCLOVAXTranslationModel
-
-            model = HyperCLOVAXTranslationModel(model_name, auth_token)
-            model.load_model_causallm()
-        else:
-            # 기존 번역 모델들은 Seq2SeqLM
-            model = TranslationModel(model_name, auth_token)
-            model.load_model_seq2seqlm()
+        model = LoaderModel(model_name, auth_token)
+        model.load_model()
 
         # 로컬 저장 (선택사항)
         if save_path:

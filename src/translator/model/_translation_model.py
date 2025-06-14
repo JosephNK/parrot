@@ -7,8 +7,9 @@ import os
 import torch
 from abc import ABC, abstractmethod
 from typing import Optional, Dict, Any
-from transformers import AutoTokenizer
 from huggingface_hub import login
+
+from ._loader_model import LoaderModel
 from ..config import config
 
 
@@ -32,69 +33,38 @@ class TranslationModel(ABC):
         elif config.get_huggingface_token():
             login(token=config.get_huggingface_token())
 
-    def load_model_seq2seqlm(self, **kwargs) -> None:
-        """모델 로드"""
-        print(f"Loading model: {self.model_name}")
-        print(f"Using device: {self.device}")
+    def load_model(self, auth_token: Optional[str] = None, **kwargs) -> None:
+        auto_model = LoaderModel(self.model_name, auth_token)
+        auto_model.load_model(**kwargs)
+        self.model_name = auto_model.model_name
+        self.tokenizer = auto_model.tokenizer
+        self.model = auto_model.model
 
-        try:
-            from transformers import AutoModelForSeq2SeqLM
+    def lang_code_to_id(self, lang: str) -> str:
+        if any(keyword in self.model_name.lower() for keyword in ["mbart"]):
+            return {
+                "korean": "ko_KR",
+                "japanese": "ja_XX",
+                "english": "en_XX",
+            }.get(lang, lang)
+        elif any(keyword in self.model_name.lower() for keyword in ["hyperclova"]):
+            return {
+                "korean": "한국어",
+                "japanese": "일본어",
+                "english": "영어",
+            }.get(lang, lang)
+        else:
+            return {
+                "korean": "kor_Hang",
+                "japanese": "jpn_Jpan",
+                "english": "eng_Latn",
+            }.get(lang, lang)
 
-            # 토크나이저 로드
-            self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-            print("✓ Tokenizer loaded")
-
-            # 모델 로드
-            model_kwargs = {
-                "torch_dtype": torch.float16 if self.device != "cpu" else torch.float32,
-                **kwargs,
-            }
-
-            self.model = AutoModelForSeq2SeqLM.from_pretrained(
-                self.model_name, **model_kwargs
-            )
-
-            # 디바이스로 이동
-            if self.device != "cpu":
-                self.model = self.model.to(self.device)
-
-            print("✓ Model loaded successfully!")
-
-        except Exception as e:
-            print(f"✗ Error loading model: {e}")
-            raise
-
-    def load_model_causallm(self, **kwargs) -> None:
-        """모델 로드"""
-        print(f"Loading model: {self.model_name}")
-        print(f"Using device: {self.device}")
-
-        try:
-            from transformers import AutoModelForCausalLM
-
-            # 토크나이저 로드
-            self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-            print("✓ Tokenizer loaded")
-
-            # CausalLM 모델 로드
-            model_kwargs = {
-                "torch_dtype": torch.float16 if self.device != "cpu" else torch.float32,
-                **kwargs,
-            }
-
-            self.model = AutoModelForCausalLM.from_pretrained(
-                self.model_name, **model_kwargs
-            )
-
-            # 디바이스로 이동
-            if self.device != "cpu":
-                self.model = self.model.to(self.device)
-
-            print("✓ Model loaded successfully!")
-
-        except Exception as e:
-            print(f"✗ Error loading HyperCLOVAX model: {e}")
-            raise
+    def show_support_lang(self) -> None:
+        if any(keyword in self.model_name.lower() for keyword in ["mbart"]):
+            print(self.tokenizer.lang_code_to_id)
+        else:
+            print(None)
 
     @abstractmethod
     def translate(self, text, source_lang, target_lang):
@@ -117,7 +87,7 @@ class TranslationModel(ABC):
             "model_name": self.model_name,
             "device": self.device,
             "is_loaded": self.model is not None,
-            "supported_languages": list(config.LANGUAGE_CODES.keys()),
+            "supported_languages": list(config.LANGUAGE_CODES),
         }
 
     def _get_device(self) -> str:

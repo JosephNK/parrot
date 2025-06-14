@@ -16,7 +16,6 @@ class OpusTranslationModel(TranslationModel):
     """Opus-MT 모델 전용 클래스"""
 
     def __init__(self, model_name: str, auth_token: Optional[str] = None):
-        """Opus-MT 모델 초기화"""
         super().__init__(model_name, auth_token)
 
     def translate(
@@ -28,7 +27,6 @@ class OpusTranslationModel(TranslationModel):
         num_beams: Optional[int] = None,
         **generate_kwargs,
     ) -> str:
-        """Opus-MT 모델 전용 번역 함수"""
         if not self.model or not self.tokenizer:
             raise ValueError("Model not loaded. Call load_model() first.")
 
@@ -64,5 +62,5 @@ class OpusTranslationModel(TranslationModel):
             return translated_text
 
         except Exception as e:
-            print(f"Opus Translation error: {e}")
+            print(f"Translation error: {e}")
             return f"[Error: {str(e)}]"

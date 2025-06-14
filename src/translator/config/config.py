@@ -37,11 +37,7 @@ class Config:
     }
 
     # 지원하는 언어 코드
-    LANGUAGE_CODES = {
-        "korean": "kor_Hang",
-        "japanese": "jpn_Jpan",
-        "english": "eng_Latn",
-    }
+    LANGUAGE_CODES = ["korean", "japanese", "english"]
 
     @classmethod
     def get_huggingface_token(cls) -> Optional[str]:

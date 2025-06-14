@@ -1,23 +1,42 @@
+torch = "2.2.2"
+torchvision = "0.17.2"
+torchaudio = "2.2.2"
+numpy = "1.26.4"
+
+
 [tool.poetry]
 name = "parrot"
 version = "0.1.0"
 description = ""
 authors = ["JosephNK <nkw0608@gmail.com>"]
 readme = "README.md"
+packages = [{include = "translator", from = "src"}] 
 
 [tool.poetry.dependencies]
 python = "^3.11"
-torch = "2.2.2"
-torchvision = "0.17.2"
-torchaudio = "2.2.2"
+torch = [
+    {version = "2.2.2", markers = "platform_machine == 'i386' or platform_machine == 'i686' or platform_machine == 'x86'"},
+    {version = "^2.7.1", markers = "platform_machine != 'i386' and platform_machine != 'i686' and platform_machine != 'x86'"}
+]
+torchvision = [
+    {version = "0.17.2", markers = "platform_machine == 'i386' or platform_machine == 'i686' or platform_machine == 'x86'"},
+    {version = "^0.22.1", markers = "platform_machine != 'i386' and platform_machine != 'i686' and platform_machine != 'x86'"}
+]
+torchaudio = [
+    {version = "2.2.2", markers = "platform_machine == 'i386' or platform_machine == 'i686' or platform_machine == 'x86'"},
+    {version = "^2.7.1", markers = "platform_machine != 'i386' and platform_machine != 'i686' and platform_machine != 'x86'"}
+]
 transformers = "^4.52.4"
 sentencepiece = "^0.2.0"
 accelerate = "^1.7.0"
 huggingface-hub = "^0.33.0"
-numpy = "1.26.4"
+numpy = [
+    {version = "1.26.4", markers = "platform_machine == 'i386' or platform_machine == 'i686' or platform_machine == 'x86'"},
+    {version = "^2.3.0", markers = "platform_machine != 'i386' and platform_machine != 'i686' and platform_machine != 'x86'"}
+]
 pandas = "^2.3.0"
 load-dotenv = "^0.1.0"
-
+protobuf = "^6.31.1"
 
 [build-system]
 requires = ["poetry-core"]

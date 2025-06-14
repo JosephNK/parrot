@@ -16,7 +16,6 @@ class HyperCLOVAXTranslationModel(TranslationModel):
     """HyperCLOVAX 모델 전용 클래스"""
 
     def __init__(self, model_name: str, auth_token: Optional[str] = None):
-        """HyperCLOVAX 모델 초기화"""
         super().__init__(model_name, auth_token)
 
     def translate(
@@ -28,7 +27,6 @@ class HyperCLOVAXTranslationModel(TranslationModel):
         num_beams: Optional[int] = None,
         **generate_kwargs,
     ) -> str:
-        """HyperCLOVAX 모델을 사용한 번역"""
         if not self.model or not self.tokenizer:
             raise ValueError("Model not loaded. Call load_model() first.")
 
@@ -36,11 +34,16 @@ class HyperCLOVAXTranslationModel(TranslationModel):
         if max_length is None:
             max_length = config.MAX_LENGTH * 2  # HyperCLOVAX는 더 긴 출력 가능
 
-        # 언어 매핑
-        lang_map = {"korean": "한국어", "japanese": "일본어", "english": "영어"}
+        # 언어 코드 확인
+        if source_lang not in config.LANGUAGE_CODES:
+            raise ValueError(f"Unsupported source language: {source_lang}")
+        if target_lang not in config.LANGUAGE_CODES:
+            raise ValueError(f"Unsupported target language: {target_lang}")
 
-        source_lang_ko = lang_map.get(source_lang, source_lang)
-        target_lang_ko = lang_map.get(target_lang, target_lang)
+        source_code = self.lang_code_to_id(source_lang)
+        target_code = self.lang_code_to_id(target_lang)
+
+        print(f"✓ Translating from '{source_code}' to '{target_code}'...")
 
         try:
             # Chat template 구성
@@ -52,7 +55,7 @@ class HyperCLOVAXTranslationModel(TranslationModel):
                 },
                 {
                     "role": "user",
-                    "content": f"다음 {source_lang_ko} 텍스트를 {target_lang_ko}로 번역해주세요:\n\n{text}\n\n번역 결과만 출력하고 다른 설명은 하지 마세요.",
+                    "content": f"다음 {source_code} 텍스트를 {target_code}로 번역해주세요:\n\n{text}\n\n번역 결과만 출력하고 다른 설명은 하지 마세요.",
                 },
             ]
 
@@ -91,5 +94,5 @@ class HyperCLOVAXTranslationModel(TranslationModel):
             return translated_text
 
         except Exception as e:
-            print(f"HyperCLOVAX Translation error: {e}")
+            print(f"Translation error: {e}")
             return f"[Error: {str(e)}]"

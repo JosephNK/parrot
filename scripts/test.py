@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Main Translation Script
+Translation Script
 
 번역 기능을 테스트하고 사용하는 메인 스크립트
 """
@@ -381,13 +381,13 @@ def show_model_info() -> None:
         print("=" * 50)
         print(f"Model: {info['model_name']}")
         print(f"Device: {info['device']}")
-        print(f"Loaded: {info['is_loaded']}")
         print(f"Languages: {', '.join(info['supported_languages'])}")
         print(f"Directions: {', '.join(info['supported_directions'])}")
 
+        print("=" * 50)
         print("\n📋 Available Models:")
         for key, model_name in info["supported_models"].items():
-            print(f"  {key}: {model_name}")
+            print(f"{key}: {model_name}")
 
     except Exception as e:
         print(f"❌ Error getting model info: {e}")
