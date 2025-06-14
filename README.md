@@ -40,3 +40,32 @@ poetry run python scripts/test.py --translate "안녕하세요. 오늘 날씨가
 ```
 poetry run python scripts/test.py --info
 ```
+
+### API
+
+```
+poe dev - 개발 서버 (자동 재시작)
+poe start - 일반 서버
+poe prod - 프로덕션 서버 (멀티 워커)
+```
+
+#### Example Curl
+```
+curl "http://localhost:8000/translate/ko2ja?text=Hello" | jq
+curl -G "http://localhost:8000/translate/ko2ja" --data-urlencode "text=안녕하세요. 오늘 날씨가 정말 좋네요" | jq
+```
+
+### Testing
+
+Hardware: Macbook M3
+
+Model: hyperclova-1.5b
+
+```
+curl -G "http://localhost:8000/translate/ko2ja" --data-urlencode "text=안녕하세요. 오늘 날씨 가 정말 좋네요" | jq
+{
+  "original": "안녕하세요. 오늘 날씨가 정말 좋네요",
+  "translated": "こんにちは。今日の天気が本当に好いです。",
+  "translate_time": "0.89s"
+}
+```

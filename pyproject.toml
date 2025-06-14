@@ -10,7 +10,7 @@ version = "0.1.0"
 description = ""
 authors = ["JosephNK <nkw0608@gmail.com>"]
 readme = "README.md"
-packages = [{include = "translator", from = "src"}] 
+packages = [{include = "parrot", from = "src"}] 
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -37,7 +37,17 @@ numpy = [
 pandas = "^2.3.0"
 load-dotenv = "^0.1.0"
 protobuf = "^6.31.1"
+fastapi = "^0.115.12"
+uvicorn = "^0.34.3"
+
+[tool.poetry.group.dev.dependencies]
+poethepoet = "^0.35.0"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poe.tasks]
+dev = "uvicorn src.parrot.api.main:app --reload"
+start = "uvicorn src.parrot.api.main:app --host 0.0.0.0 --port 8000"
+prod = "uvicorn src.parrot.api.main:app --host 0.0.0.0 --port 8000 --workers 4"
