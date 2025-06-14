@@ -20,6 +20,8 @@ https://huggingface.co/docs/hub/security-tokens
 HUGGINGFACE_HUB_TOKEN=value
 ```
 
+### Install
+
 ```bash
 poetry install
 ```
