@@ -1,12 +1,12 @@
 # Parrot
 
-This project provides **automatic translation between Korean and Japanese** using Facebook's NLLB or Opus models.
+This project provides **automatic translation between Korean and Japanese** using Facebook's M2M or NLLB models.
 
 ## Key Features
 
 - Supports bidirectional translation: Korean → Japanese and Japanese → Korean
 - Built on the Hugging Face Transformers library
-- Utilizes large pre-trained AI translation models (NLLB, Opus, etc.)
+- Utilizes large pre-trained AI translation models (M2M, NLLB, etc.)
 
 ### Download Model
 
