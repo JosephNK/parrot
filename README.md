@@ -8,9 +8,25 @@ This project provides **automatic translation between Korean and Japanese** usin
 - Built on the Hugging Face Transformers library
 - Utilizes large pre-trained AI translation models (M2M, NLLB, etc.)
 
-### Download Model
+### Setup
+
+Getting a Hugging Face Access Token (Read)
+
+https://huggingface.co/docs/hub/security-tokens
 
 ```
+.env
+
+HUGGINGFACE_HUB_TOKEN=value
+```
+
+```bash
+poetry install
+```
+
+### Download Model
+
+```bash
 poetry run python scripts/download_models.py --model nllb-200
 poetry run python scripts/download_models.py --model m2m-100-1.2b
 poetry run python scripts/download_models.py --model hyperclova-1.5b
@@ -18,7 +34,7 @@ poetry run python scripts/download_models.py --model hyperclova-1.5b
 
 ### Translate
 
-```
+```bash
 poetry run python scripts/test.py --translate "안녕하세요. 오늘 날씨가 정말 좋네요." ko2ja --model nllb-200
 poetry run python scripts/test.py --translate "안녕하세요. 오늘 날씨가 정말 좋네요." ko2ja --model m2m-100-1.2b
 poetry run python scripts/test.py --translate "안녕하세요. 오늘 날씨가 정말 좋네요." ko2ja --model hyperclova-1.5b
@@ -26,13 +42,13 @@ poetry run python scripts/test.py --translate "안녕하세요. 오늘 날씨가
 
 ### Info
 
-```
+```bash
 poetry run python scripts/test.py --info
 ```
 
 ### API
 
-```
+```bash
 poe dev - 개발 서버 (자동 재시작)
 poe start - 일반 서버
 poe prod - 프로덕션 서버 (멀티 워커)
@@ -40,7 +56,7 @@ poe prod - 프로덕션 서버 (멀티 워커)
 
 ### Testing
 
-### Environment Information
+#### Environment Information
 - **Hardware**: Macbook M3
 - **Model**: m2m-100-1.2b
 - **Description**: `Text2Text Generation` A task that takes input text and transforms it into a different form of text.
@@ -77,7 +93,7 @@ Response:
 }
 ```
 
-### Environment Information
+#### Environment Information
 - **Hardware**: Macbook M3
 - **Model**: hyperclova-1.5b
 - **Description**: `Safetensors` A new file format for storing machine learning model weights.
