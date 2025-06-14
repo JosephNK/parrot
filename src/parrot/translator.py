@@ -5,11 +5,13 @@ Korean-Japanese Translator Module
 """
 
 from typing import Optional, List, Dict, Any
+
 from .model import (
-    NLLBTranslationModel,
-    MBartTranslationModel,
-    OpusTranslationModel,
     HyperCLOVAXTranslationModel,
+    M2MTranslationModel,
+    MBartTranslationModel,
+    NLLBTranslationModel,
+    OpusTranslationModel,
 )
 from .config import config
 
@@ -29,6 +31,16 @@ class KoreanJapaneseTranslator:
             auth_token: Hugging Face 인증 토큰
             auto_load: 초기화 시 자동으로 모델 로드
         """
+        self.model = None
+        self.model_name = model_name
+        self.load_model(model_name, auth_token, auto_load)
+
+    def load_model(
+        self,
+        model_name: Optional[str] = None,
+        auth_token: Optional[str] = None,
+        auto_load: bool = True,
+    ) -> None:
         if model_name is None:
             model_name = config.SUPPORTED_MODELS["nllb-200"]
         elif model_name in config.SUPPORTED_MODELS:
@@ -37,6 +49,8 @@ class KoreanJapaneseTranslator:
         # 모델 타입에 따라 적절한 클래스 선택
         if "nllb" in model_name.lower():
             self.model = NLLBTranslationModel(model_name, auth_token)
+        elif "m2m" in model_name.lower():
+            self.model = M2MTranslationModel(model_name, auth_token)
         elif "mbart" in model_name.lower():
             self.model = MBartTranslationModel(model_name, auth_token)
         elif "opus" in model_name.lower():
@@ -46,6 +60,15 @@ class KoreanJapaneseTranslator:
 
         if auto_load:
             self.model.load_model()
+
+    # def unload_model(self) -> None:
+    #     """현재 로드된 모델 언로드"""
+    #     if hasattr(self, "model") and self.model is not None:
+    #         self.model.unload_model()
+    #         del self.model
+    #         print("모델이 성공적으로 언로드되었습니다.")
+    #     else:
+    #         print("현재 로드된 모델이 없습니다.")
 
     def ko2ja(self, text: str, **kwargs) -> str:
         """

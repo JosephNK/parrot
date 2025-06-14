@@ -29,6 +29,7 @@ class Config:
     # 지원 모델 목록
     SUPPORTED_MODELS = {
         "nllb-200": "facebook/nllb-200-distilled-600M",
+        "m2m-100-1.2b": "facebook/m2m100_1.2B",
         "mbart-50": "facebook/mbart-large-50-many-to-many-mmt",
         "opus-ko-ja": "Helsinki-NLP/opus-mt-ko-jap",
         "opus-ja-ko": "Helsinki-NLP/opus-mt-jap-ko",

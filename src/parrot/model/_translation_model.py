@@ -47,6 +47,12 @@ class TranslationModel(ABC):
                 "japanese": "ja_XX",
                 "english": "en_XX",
             }.get(lang, lang)
+        elif any(keyword in self.model_name.lower() for keyword in ["m2m"]):
+            return {
+                "korean": "ko",
+                "japanese": "ja",
+                "english": "en",
+            }.get(lang, lang)
         elif any(keyword in self.model_name.lower() for keyword in ["hyperclova"]):
             return {
                 "korean": "한국어",

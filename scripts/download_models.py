@@ -10,14 +10,14 @@ import sys
 import argparse
 from pathlib import Path
 from typing import Optional
-from translator.model import LoaderModel
+from parrot.model import LoaderModel
 
 # 프로젝트 루트를 Python path에 추가
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root / "src"))
 
-from translator.translator import KoreanJapaneseTranslator
-from translator.config import config
+from parrot.translator import KoreanJapaneseTranslator
+from parrot.config import config
 
 
 def download_model(

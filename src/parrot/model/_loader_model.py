@@ -35,7 +35,7 @@ class LoaderModel:
             self.__load_model_seq2seqlm(**kwargs)
 
     def __load_model_seq2seqlm(self, **kwargs) -> None:
-        """모델 로드"""
+        """Seq2SeqLM 모델 로드"""
         print(f"Loading model (seq2seqlm): {self.model_name}")
         print(f"Using device: {self.device}")
 
@@ -67,7 +67,7 @@ class LoaderModel:
             raise
 
     def __load_model_causallm(self, **kwargs) -> None:
-        """모델 로드"""
+        """CausalLM 모델 로드"""
         print(f"Loading model (causallm): {self.model_name}")
         print(f"Using device: {self.device}")
 
