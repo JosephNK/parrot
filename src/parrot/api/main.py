@@ -15,7 +15,7 @@ translator: KoreanJapaneseTranslator = None
 
 # 캐시 시스템 초기화
 cache = TranslationCache(
-    host=config.RADIS_HOST,
+    host=config.REDIS_HOST,
     port=config.REDIS_PORT,
     expire_time=config.REDIS_CACHE_TTL,
 )

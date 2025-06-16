@@ -41,7 +41,7 @@ class Config:
     LANGUAGE_CODES = ["korean", "japanese", "english"]
 
     # Radis 설정
-    RADIS_HOST: str = os.getenv("RADIS_HOST", "localhost")
+    REDIS_HOST: str = os.getenv("REDIS_HOST", "localhost")
     REDIS_PORT: int = int(os.getenv("REDIS_PORT", "6379"))
     REDIS_CACHE_TTL: int = int(os.getenv("REDIS_CACHE_TTL", "86400"))
 

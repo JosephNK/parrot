@@ -1,0 +1,107 @@
+version: '3.8'
+
+services:
+  # 프로덕션 API 서비스
+  prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - PYTHONPATH=/app/src
+      - LOG_LEVEL=INFO
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    volumes:
+      - ./models_cache:/app/models_cache
+      - parrot_cache:/app/cache
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - parrot-network
+
+  # 개발 모드 서비스 (development 스테이지 사용)
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    ports:
+      - "8001:8000"
+    env_file:
+      - .env
+    environment:
+      - PYTHONPATH=/app/src
+      - LOG_LEVEL=DEBUG
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    volumes:
+      # 코드 변경 사항을 실시간 반영
+      - ./src:/app/src
+      - ./scripts:/app/scripts
+      - ./models_cache:/app/models_cache
+      - parrot_cache_dev:/app/cache
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    profiles:
+      - dev
+    networks:
+      - parrot-network
+
+  # Redis 캐시
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - parrot-network
+
+  # Redis Commander (개발 환경에서만 사용)
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
+    profiles:
+      - dev
+    networks:
+      - parrot-network
+
+volumes:
+  parrot_cache:
+    driver: local
+  parrot_cache_dev:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  parrot-network:
+    driver: bridge
