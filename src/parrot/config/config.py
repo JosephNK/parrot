@@ -40,6 +40,11 @@ class Config:
     # 지원하는 언어 코드
     LANGUAGE_CODES = ["korean", "japanese", "english"]
 
+    # Radis 설정
+    RADIS_HOST: str = os.getenv("RADIS_HOST", "localhost")
+    REDIS_PORT: int = int(os.getenv("REDIS_PORT", "6379"))
+    REDIS_CACHE_TTL: int = int(os.getenv("REDIS_CACHE_TTL", "86400"))
+
     @classmethod
     def get_huggingface_token(cls) -> Optional[str]:
         """Hugging Face 토큰 반환"""

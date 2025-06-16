@@ -2,14 +2,23 @@ import time
 from fastapi import FastAPI, Query, Request
 from fastapi.responses import JSONResponse
 
-from parrot.exception.exception import TranslationError
-from parrot.translator import KoreanJapaneseTranslator
+from ..cache.translation_cache import TranslationCache
+from ..exception.exception import TranslationError
+from ..translator import KoreanJapaneseTranslator
+from ..config import config
 
 # FastAPI 앱 생성
 app = FastAPI()
 
 # 한국어-일본어 번역기 인스턴스 생성
 translator: KoreanJapaneseTranslator = None
+
+# 캐시 시스템 초기화
+cache = TranslationCache(
+    host=config.RADIS_HOST,
+    port=config.REDIS_PORT,
+    expire_time=config.REDIS_CACHE_TTL,
+)
 
 
 # 커스텀 예외 핸들러
@@ -47,9 +56,19 @@ def translate_ko2ja(
     if translator.model_name != model:
         translator.load_model(model_name=model, auto_load=True)
 
+    # 캐시에서 번역 결과 조회
+    cache_result = cache.get_translation(text)
+    if cache_result is not None:
+        return cache_result
+
+    # 번역
     translate_start = time.time()
     result = translator.ko2ja(text)
     translate_time = time.time() - translate_start
+
+    # 캐시에 저장
+    cache.save_translation(text, result, translate_time)
+
     return {
         "original": text,
         "translated": result,

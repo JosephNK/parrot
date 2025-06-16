@@ -1,5 +1,6 @@
-from .exception import exception
+from .exception import TranslationErrorCode, TranslationError
 
 __all__ = [
-    "exception",
+    "TranslationErrorCode",
+    "TranslationError",
 ]
