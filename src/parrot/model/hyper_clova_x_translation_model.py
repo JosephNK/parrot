@@ -3,13 +3,11 @@ HyperCLOVAX Model Module
 
 """
 
-import os
 import re
-import time
 import torch
-from typing import Optional
-from transformers import AutoTokenizer
-from huggingface_hub import login
+from typing import Any, Optional
+
+from ..exception.exception import TranslationError, TranslationErrorCode
 from ._translation_model import TranslationModel
 from ..config import config
 
@@ -17,37 +15,38 @@ from ..config import config
 class HyperCLOVAXTranslationModel(TranslationModel):
     """HyperCLOVAX 모델 전용 클래스"""
 
-    def __init__(self, model_name: str, auth_token: Optional[str] = None):
-        super().__init__(model_name, auth_token)
+    def __init__(self, model_name: str):
+        super().__init__(model_name)
+
+        # 이 특정 모델에 맞게 max_length 조정
+        self.max_length = min(self.max_length * 2, 1024)
+
+    def lang_code_to_id(self, lang: str) -> str:
+        return {
+            "korean": "한국어",
+            "japanese": "일본어",
+            "english": "영어",
+        }.get(lang, lang)
+
+    def vaidate_lang(
+        self,
+        source_lang: str,
+        target_lang: str,
+    ) -> None:
+        self.source_code, self.target_code = self.vaidate_support_lang(
+            source_lang, target_lang
+        )
 
     def translate(
         self,
         text: str,
         source_lang: str,
         target_lang: str,
-        max_length: Optional[int] = None,
-        num_beams: Optional[int] = None,
         **generate_kwargs,
     ) -> str:
-        if not self.model or not self.tokenizer:
-            raise ValueError("Model not loaded. Call load_model() first.")
-
-        # 기본값 설정
-        if max_length is None:
-            max_length = min(config.MAX_LENGTH * 2, 1024)
-
-        # 언어 코드 확인
-        if source_lang not in config.LANGUAGE_CODES:
-            raise ValueError(f"Unsupported source language: {source_lang}")
-        if target_lang not in config.LANGUAGE_CODES:
-            raise ValueError(f"Unsupported target language: {target_lang}")
-
-        source_code = self.lang_code_to_id(source_lang)
-        target_code = self.lang_code_to_id(target_lang)
-
-        print(f"✓ Translating from '{source_code}' to '{target_code}'...")
-
         try:
+            super().translate(text, source_lang, target_lang, **generate_kwargs)
+
             # Chat template 구성
             chat = [
                 {
@@ -56,7 +55,7 @@ class HyperCLOVAXTranslationModel(TranslationModel):
                 },
                 {
                     "role": "user",
-                    "content": f"다음 {source_code} 텍스트를 {target_code}로 번역해주세요.\n\n{text}",
+                    "content": f"다음 {self.source_code} 텍스트를 {self.target_code}로 번역해주세요.\n\n{text}",
                 },
             ]
 
@@ -66,14 +65,13 @@ class HyperCLOVAXTranslationModel(TranslationModel):
             )
 
             # 디바이스로 이동
-            if self.device != "cpu":
-                inputs = {k: v.to(self.device) for k, v in inputs.items()}
+            inputs = self.move_inputs_to_device(inputs)
 
             # 번역 생성
             with torch.no_grad():
                 outputs = self.model.generate(
                     **inputs,
-                    max_new_tokens=max_length,
+                    max_new_tokens=self.max_length,
                     do_sample=False,  # 탐욕적 디코딩으로 가장 확률 높은 토큰 선택
                     repetition_penalty=1.1,  # 반복 방지
                     stop_strings=["<|endofturn|>", "<|stop|>"],
@@ -101,4 +99,6 @@ class HyperCLOVAXTranslationModel(TranslationModel):
 
         except Exception as e:
             print(f"Translation error: {e}")
-            return f"[Error: {str(e)}]"
+            raise TranslationError(
+                message=str(e), error_code=TranslationErrorCode.TRANSLATION_ERROR
+            )

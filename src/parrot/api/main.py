@@ -1,6 +1,8 @@
 import time
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Request
+from fastapi.responses import JSONResponse
 
+from parrot.exception.exception import TranslationError
 from parrot.translator import KoreanJapaneseTranslator
 
 # FastAPI 앱 생성
@@ -8,6 +10,20 @@ app = FastAPI()
 
 # 한국어-일본어 번역기 인스턴스 생성
 translator: KoreanJapaneseTranslator = None
+
+
+# 커스텀 예외 핸들러
+@app.exception_handler(TranslationError)
+async def custom_exception_handler(request: Request, exc: TranslationError):
+    return JSONResponse(
+        status_code=exc.code,
+        content={
+            "error": {
+                "message": exc.message,
+                "code": exc.error_code,
+            }
+        },
+    )
 
 
 # 기본 루트 경로
@@ -44,6 +60,8 @@ def translate_ko2ja(
 # 테스트
 @app.get("/test")
 def hello_name():
+    if translator is None:
+        translator = KoreanJapaneseTranslator(model_name="nllb-200", auto_load=True)
     text = "안녕하세요. 오늘 날씨가 정말 좋네요"
     translate_start = time.time()
     result = translator.ko2ja(text)

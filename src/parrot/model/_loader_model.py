@@ -7,7 +7,7 @@ from ..config import config
 
 
 class LoaderModel:
-    """번역 모델 클래스"""
+    """모델 Loader 클래스"""
 
     def __init__(self, model_name: str, auth_token: Optional[str] = None):
         """
