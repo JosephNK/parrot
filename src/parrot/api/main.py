@@ -41,6 +41,31 @@ def read_root():
     return {"message": "Hello, this is the Korean-Japanese translation API!"}
 
 
+# 헬스체크
+@app.get("/health")
+def health_check():
+    try:
+        # 기본적인 상태 확인
+        status = {
+            "status": "healthy",
+            "timestamp": time.time(),
+        }
+
+        # 캐시 연결 상태 확인 (선택사항)
+        try:
+            cache_status = cache.ping() if hasattr(cache, "ping") else "unknown"
+            status["cache"] = cache_status
+        except Exception:
+            status["cache"] = "disconnected"
+
+        return status
+    except Exception as e:
+        return JSONResponse(
+            status_code=503,
+            content={"status": "unhealthy", "timestamp": time.time(), "error": str(e)},
+        )
+
+
 # 한국어 -> 일본어 번역 API (Query 파라미터)
 @app.get("/translate/ko2ja")
 def translate_ko2ja(
