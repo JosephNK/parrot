@@ -18,7 +18,7 @@ redis_port = config.REDIS_PORT
 redis_cache_ttl = config.REDIS_CACHE_TTL
 
 translation_cache: TranslationCache = None
-if redis_host is None or redis_port is None:
+if redis_host is not "" and redis_port is not 0:
     # 캐시 시스템 초기화
     translation_cache = TranslationCache(
         host=redis_host,

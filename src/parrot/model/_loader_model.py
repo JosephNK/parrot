@@ -53,7 +53,8 @@ class LoaderModel:
             }
 
             self.model = AutoModelForSeq2SeqLM.from_pretrained(
-                self.model_name, **model_kwargs
+                self.model_name,
+                **model_kwargs,
             )
 
             # 디바이스로 이동

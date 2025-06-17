@@ -43,6 +43,14 @@ class NLLBTranslationModel(TranslationModel):
         try:
             super().translate(text, source_lang, target_lang, **generate_kwargs)
 
+            # 용어집 RAG
+            if self.rag_model is not None:
+                text = self.rag_model.retrieve_text_with_domain(
+                    text=text,
+                    domain="kpop",
+                )
+                print(f"Retrieved text: {text}")
+
             # NLLB 모델은 src_lang을 토크나이저 속성으로 설정
             self.tokenizer.src_lang = self.source_code
             inputs = self.tokenizer(text, return_tensors="pt")

@@ -3,11 +3,11 @@ Translation Model Module
 
 """
 
-import os
 import torch
 from abc import ABC, abstractmethod
 from typing import Optional, Dict, Any
 
+from ._translation_rag_model import TranslationRagModel
 from ._loader_model import LoaderModel
 from ..config import config
 
@@ -15,20 +15,27 @@ from ..config import config
 class TranslationModel(ABC):
     """번역 모델 클래스"""
 
-    def __init__(self, model_name: str):
+    rag_model: TranslationRagModel = None
+
+    def __init__(self, model_name: str, use_rag: Optional[bool] = True):
         """
         Args:
             model_name: Hugging Face 모델 이름
-            auth_token: Hugging Face 인증 토큰 (선택사항)
+            use_rag: RAG 사용 여부 (선택사항, 기본값: True)
         """
         self.model_name = model_name
         self.tokenizer = None
         self.model = None
         self.device = self._get_device()
+        self.use_rag = use_rag
 
         max_length, num_beams = self._get_config()
         self.max_length = max_length
         self.num_beams = num_beams
+
+        if self.use_rag:
+            self.rag_model = TranslationRagModel()
+            self.rag_model.load_terminology_db()
 
     def load_model(self, auth_token: Optional[str] = None, **kwargs) -> None:
         auto_model = LoaderModel(self.model_name, auth_token)
@@ -130,8 +137,6 @@ class TranslationModel(ABC):
             return "cpu"
 
     def _get_config(self) -> tuple[int, int]:
-        if max_length is None:
-            max_length = config.MAX_LENGTH
-        if num_beams is None:
-            num_beams = config.NUM_BEAMS
+        max_length = config.MAX_LENGTH
+        num_beams = config.NUM_BEAMS
         return max_length, num_beams

@@ -22,7 +22,6 @@ class KoreanJapaneseTranslator:
     def __init__(
         self,
         model_name: Optional[str] = None,
-        auth_token: Optional[str] = None,
         auto_load: bool = True,
     ):
         """
@@ -33,12 +32,11 @@ class KoreanJapaneseTranslator:
         """
         self.model = None
         self.model_name = model_name
-        self.load_model(model_name, auth_token, auto_load)
+        self.load_model(model_name, auto_load)
 
     def load_model(
         self,
         model_name: Optional[str] = None,
-        auth_token: Optional[str] = None,
         auto_load: bool = True,
     ) -> None:
         if model_name is None:
@@ -48,15 +46,15 @@ class KoreanJapaneseTranslator:
 
         # 모델 타입에 따라 적절한 클래스 선택
         if "nllb" in model_name.lower():
-            self.model = NLLBTranslationModel(model_name, auth_token)
+            self.model = NLLBTranslationModel(model_name)
         elif "m2m" in model_name.lower():
-            self.model = M2MTranslationModel(model_name, auth_token)
+            self.model = M2MTranslationModel(model_name)
         elif "mbart" in model_name.lower():
-            self.model = MBartTranslationModel(model_name, auth_token)
+            self.model = MBartTranslationModel(model_name)
         elif "opus" in model_name.lower():
-            self.model = OpusTranslationModel(model_name, auth_token)
+            self.model = OpusTranslationModel(model_name)
         elif "hyperclova" in model_name.lower():
-            self.model = HyperCLOVAXTranslationModel(model_name, auth_token)
+            self.model = HyperCLOVAXTranslationModel(model_name)
 
         if auto_load:
             self.model.load_model()
