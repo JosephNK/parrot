@@ -59,7 +59,11 @@ def health_check():
 
         # 캐시 연결 상태 확인 (선택사항)
         try:
-            cache_status = cache.ping() if hasattr(cache, "ping") else "unknown"
+            cache_status = (
+                translation_cache.ping()
+                if hasattr(translation_cache, "ping")
+                else "unknown"
+            )
             status["cache"] = cache_status
         except Exception:
             status["cache"] = "disconnected"
