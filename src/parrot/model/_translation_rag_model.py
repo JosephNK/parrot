@@ -3,10 +3,20 @@ Translation RAG Model Module
 
 """
 
-import faiss
 import numpy as np
 from typing import List, Optional, Tuple
 from sentence_transformers import SentenceTransformer
+
+Faiss = None
+
+
+def lazyFaiss():
+    if Faiss is None:
+        print("FAISS 모듈 로딩 중...")
+        import faiss
+
+        Faiss = faiss
+    return Faiss
 
 
 class TranslationRagModel:
@@ -23,6 +33,12 @@ class TranslationRagModel:
     def load_terminology_db(self) -> None:
         # 용어 매핑 정의
         self.terminology_db = {
+            "general": [
+                ("안녕", "こんにちは"),
+                ("감사합니다", "ありがとうございます"),
+                ("미안해", "ごめん"),
+                ("사랑해", "愛してる"),
+            ],
             "kpop": [
                 ("포카", "フォトカード"),
                 ("앨범", "アルバム"),
@@ -35,18 +51,9 @@ class TranslationRagModel:
                 ("본진", "本命"),
                 ("부캐", "副垢"),
             ],
-            "general": [
-                ("안녕", "こんにちは"),
-                ("감사합니다", "ありがとうございます"),
-                ("미안해", "ごめん"),
-                ("사랑해", "愛してる"),
-            ],
         }
 
-        self._build_faiss_index()
-        print(f"Terminology database loaded: {len(self.term_pairs)} terms")
-
-    def _build_faiss_index(self):
+    def build_index(self):
         """FAISS 인덱스 구축"""
         all_terms = []
         all_pairs = []
@@ -62,7 +69,7 @@ class TranslationRagModel:
 
             # FAISS 인덱스 구축
             dimension = embeddings.shape[1]
-            self.faiss_index = faiss.IndexFlatIP(dimension)  # 코사인 유사도
+            self.faiss_index = Faiss.IndexFlatIP(dimension)  # 코사인 유사도
 
             # 정규화 후 인덱스에 추가
             embeddings_normalized = embeddings / np.linalg.norm(
@@ -72,6 +79,8 @@ class TranslationRagModel:
 
             self.term_embeddings = embeddings_normalized
             self.term_pairs = all_pairs
+
+        print(f"Terminology database loaded: {len(self.term_pairs)} terms")
 
     def retrieve_terminology(
         self,

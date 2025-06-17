@@ -7,6 +7,7 @@ import re
 import torch
 from typing import Any, Optional
 
+from ._translation_rag_model import TranslationRagModel
 from ..exception.exception import TranslationError, TranslationErrorCode
 from ._translation_model import TranslationModel
 from ..config import config
@@ -20,6 +21,9 @@ class HyperCLOVAXTranslationModel(TranslationModel):
 
         # 이 특정 모델에 맞게 max_length 조정
         self.max_length = min(self.max_length * 2, 1024)
+
+        self.rag_model = TranslationRagModel()
+        self.rag_model.load_terminology_db()
 
     def lang_code_to_id(self, lang: str) -> str:
         return {
