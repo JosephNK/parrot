@@ -13,12 +13,18 @@ app = FastAPI()
 # 한국어-일본어 번역기 인스턴스 생성
 translator: KoreanJapaneseTranslator = None
 
-# 캐시 시스템 초기화
-cache = TranslationCache(
-    host=config.REDIS_HOST,
-    port=config.REDIS_PORT,
-    expire_time=config.REDIS_CACHE_TTL,
-)
+redis_host = config.REDIS_HOST
+redis_port = config.REDIS_PORT
+redis_cache_ttl = config.REDIS_CACHE_TTL
+
+translation_cache: TranslationCache = None
+if redis_host is None or redis_port is None:
+    # 캐시 시스템 초기화
+    translation_cache = TranslationCache(
+        host=redis_host,
+        port=redis_port,
+        expire_time=redis_cache_ttl,
+    )
 
 
 # 커스텀 예외 핸들러
@@ -81,18 +87,20 @@ def translate_ko2ja(
     if translator.model_name != model:
         translator.load_model(model_name=model, auto_load=True)
 
-    # 캐시에서 번역 결과 조회
-    cache_result = cache.get_translation(text)
-    if cache_result is not None:
-        return cache_result
+    if translation_cache is not None:
+        # 캐시에서 번역 결과 조회
+        cache_result = translation_cache.get_translation(text)
+        if cache_result is not None:
+            return cache_result
 
     # 번역
     translate_start = time.time()
     result = translator.ko2ja(text)
     translate_time = time.time() - translate_start
 
-    # 캐시에 저장
-    cache.save_translation(text, result, translate_time)
+    if translation_cache is not None:
+        # 캐시에 저장
+        translation_cache.save_translation(text, result, translate_time)
 
     return {
         "original": text,
