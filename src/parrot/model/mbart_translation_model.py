@@ -43,6 +43,16 @@ class MBartTranslationModel(TranslationModel):
         try:
             super().translate(text, source_lang, target_lang, **generate_kwargs)
 
+            # 텍스트 전처리
+            text = self.rag_model.retrieve_replace_text_with_domain(
+                text=text,
+                domain=self.rag_model.get_domain_from_lang(
+                    source_lang,
+                    target_lang,
+                    use_replacement=True,
+                ),
+            )
+
             # MBart 모델은 src_lang을 토크나이저 속성으로 설정
             self.tokenizer.src_lang = self.source_code
             inputs = self.tokenizer(text, return_tensors="pt")

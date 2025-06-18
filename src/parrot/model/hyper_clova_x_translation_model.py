@@ -46,14 +46,17 @@ class HyperCLOVAXTranslationModel(TranslationModel):
         try:
             super().translate(text, source_lang, target_lang, **generate_kwargs)
 
-            # 텍스트 전처리
+            # RAG 모델을 사용하여 용어 검색
             terminology_hint = self.rag_model.retrieve_text_with_domain(
                 text=text,
-                domain="ko2ja",
+                domain=self.rag_model.get_domain_from_lang(
+                    source_lang,
+                    target_lang,
+                ),
             )
 
             # Chat template 구성
-            chat = [
+            template = [
                 {"role": "tool_list", "content": ""},
                 {
                     "role": "system",
@@ -74,7 +77,10 @@ class HyperCLOVAXTranslationModel(TranslationModel):
 
             # Chat template 적용
             inputs = self.tokenizer.apply_chat_template(
-                chat, add_generation_prompt=True, return_dict=True, return_tensors="pt"
+                template,
+                add_generation_prompt=True,
+                return_dict=True,
+                return_tensors="pt",
             )
 
             # 디바이스로 이동
@@ -89,7 +95,6 @@ class HyperCLOVAXTranslationModel(TranslationModel):
                         "<|endofturn|>",
                         "<|stop|>",
                     ],
-                    tokenizer=self.tokenizer,
                     **generate_kwargs,
                 )
 
@@ -99,14 +104,14 @@ class HyperCLOVAXTranslationModel(TranslationModel):
                 generated_tokens, skip_special_tokens=True
             ).strip()
 
-            print(f"✓ Translation completed: {translated_text}")
-
             # 불필요한 부분 정리
             if "<|endofturn|>" in translated_text:
                 translated_text = translated_text.split("<|endofturn|>")[0].strip()
 
             # 백틱과 불필요한 줄바꿈 제거
             translated_text = re.sub(r"```[\r\n]*|[\r\n]*```", "", translated_text)
+
+            print(f"✓ Translation completed: {translated_text}")
 
             return translated_text
 

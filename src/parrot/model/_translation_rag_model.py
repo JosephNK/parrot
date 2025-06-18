@@ -40,6 +40,12 @@ class TranslationRagModel:
                 ("덕질", "推し活"),
                 ("부캐", "副垢"),
             ],
+            "ja2ko": [
+                ("フォトカード", "포카"),
+                ("グッズ", "굿즈"),
+                ("推し活", "덕질"),
+                ("副垢", "부캐"),
+            ],
             "ko2ko": [
                 ("포카", "포토카드"),
                 ("굿즈", "굿즈"),
@@ -48,6 +54,19 @@ class TranslationRagModel:
             ],
         }
         self.build_index()
+
+    def get_domain_from_lang(
+        self,
+        source_lang: str,
+        target_lang: str,
+        use_replacement: bool = False,
+    ) -> str:
+        if source_lang == "korean" and target_lang == "japanese":
+            return "ko2ja" if not use_replacement else "ko2ko"
+        elif source_lang == "japanese" and target_lang == "korean":
+            return "ja2ko" if not use_replacement else "ja2ja"
+        else:
+            return "ko2ja"
 
     def build_index(self):
         """FAISS 인덱스 구축"""
@@ -93,7 +112,7 @@ class TranslationRagModel:
         retrieved_terms = []
 
         for word in words:
-            if len(word) > 2:
+            if len(word) >= 2:
                 query_embedding = self.embedding_model.encode([word])
                 query_normalized = query_embedding / np.linalg.norm(query_embedding)
 
@@ -110,9 +129,21 @@ class TranslationRagModel:
                                 (source_term, target_term, term_domain, score)
                             )
 
-        return retrieved_terms
+        # 중복 제거 (highest score만 유지)
+        unique_terms = {}
+        for source_term, target_term, term_domain, score in retrieved_terms:
+            key = (source_term, target_term, term_domain)
+            if key not in unique_terms or unique_terms[key][3] < score:
+                unique_terms[key] = (source_term, target_term, term_domain, score)
 
-    def retrieve_replace_text_with_domain(self, text: str, domain: str) -> str:
+        # 점수 순으로 정렬
+        return sorted(unique_terms.values(), key=lambda x: x[3], reverse=True)
+
+    def retrieve_replace_text_with_domain(
+        self,
+        text: str,
+        domain: Optional[str] = None,
+    ) -> str:
         # 1. 도메인별 관련 용어 검색
         retrieved_terms = self.retrieve_terminology(text, domain=domain)
 

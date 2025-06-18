@@ -45,7 +45,12 @@ class NLLBTranslationModel(TranslationModel):
 
             # 텍스트 전처리
             text = self.rag_model.retrieve_replace_text_with_domain(
-                text=text, domain="ko2ko"
+                text=text,
+                domain=self.rag_model.get_domain_from_lang(
+                    source_lang,
+                    target_lang,
+                    use_replacement=True,
+                ),
             )
 
             # NLLB 모델은 src_lang을 토크나이저 속성으로 설정
