@@ -27,7 +27,9 @@ class LoaderModel:
             login(token=config.get_huggingface_token())
 
     def load_model(self, **kwargs) -> None:
-        if any(keyword in self.model_name.lower() for keyword in ["hyperclova"]):
+        if any(
+            keyword in self.model_name.lower() for keyword in ["hyperclova", "qwen"]
+        ):
             # CausalLM
             self.__load_model_causallm(**kwargs)
         else:

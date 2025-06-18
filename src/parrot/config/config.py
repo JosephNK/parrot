@@ -31,9 +31,7 @@ class Config:
         "nllb-200": "facebook/nllb-200-distilled-600M",
         "m2m-100-1.2b": "facebook/m2m100_1.2B",
         "mbart-50": "facebook/mbart-large-50-many-to-many-mmt",
-        "opus-ko-ja": "Helsinki-NLP/opus-mt-ko-jap",
-        "opus-ja-ko": "Helsinki-NLP/opus-mt-jap-ko",
-        "hyperclova-0.5b": "naver-hyperclovax/HyperCLOVAX-SEED-Text-Instruct-0.5B",
+        "qwen2.5-1.5b": "Qwen/Qwen2.5-1.5B-Instruct",
         "hyperclova-1.5b": "naver-hyperclovax/HyperCLOVAX-SEED-Text-Instruct-1.5B",
     }
 

@@ -11,6 +11,7 @@ Faiss = None
 
 
 def lazyFaiss():
+    global Faiss
     if Faiss is None:
         print("FAISS 모듈 로딩 중...")
         import faiss
@@ -33,25 +34,20 @@ class TranslationRagModel:
     def load_terminology_db(self) -> None:
         # 용어 매핑 정의
         self.terminology_db = {
-            "general": [
-                ("안녕", "こんにちは"),
-                ("감사합니다", "ありがとうございます"),
-                ("미안해", "ごめん"),
-                ("사랑해", "愛してる"),
-            ],
-            "kpop": [
+            "ko2ja": [
                 ("포카", "フォトカード"),
-                ("앨범", "アルバム"),
-                ("콘서트", "コンサート"),
-                ("팬미팅", "ファンミーティング"),
-                ("사인회", "サイン会"),
                 ("굿즈", "グッズ"),
                 ("덕질", "推し活"),
-                ("최애", "推し"),
-                ("본진", "本命"),
                 ("부캐", "副垢"),
             ],
+            "ko2ko": [
+                ("포카", "포토카드"),
+                ("굿즈", "굿즈"),
+                ("덕질", "오타쿠"),
+                ("부캐", "부 캐릭터"),
+            ],
         }
+        self.build_index()
 
     def build_index(self):
         """FAISS 인덱스 구축"""
@@ -69,7 +65,7 @@ class TranslationRagModel:
 
             # FAISS 인덱스 구축
             dimension = embeddings.shape[1]
-            self.faiss_index = Faiss.IndexFlatIP(dimension)  # 코사인 유사도
+            self.faiss_index = lazyFaiss().IndexFlatIP(dimension)  # 코사인 유사도
 
             # 정규화 후 인덱스에 추가
             embeddings_normalized = embeddings / np.linalg.norm(
@@ -116,19 +112,40 @@ class TranslationRagModel:
 
         return retrieved_terms
 
-    def retrieve_text_with_domain(self, text: str, domain: Optional[str] = None) -> str:
+    def retrieve_replace_text_with_domain(self, text: str, domain: str) -> str:
         # 1. 도메인별 관련 용어 검색
         retrieved_terms = self.retrieve_terminology(text, domain=domain)
 
-        # 2. 컨텍스트 구성
-        context_text = text
-        if retrieved_terms:
-            terminology_context = "\n".join(
-                [
-                    f"{source}: {target} ({term_domain})"
-                    for source, target, term_domain, _ in retrieved_terms[:3]
-                ]
-            )
-            context_text = f"용어집:\n{terminology_context}\n\n번역할 텍스트: {text}"
+        # 원문에서 특수 용어를 일반적인 단어로 교체
+        preprocessed_text = text
+        for source_term, target_term, _, _ in retrieved_terms:
+            if source_term in preprocessed_text:
+                # 임시로 일반적인 단어로 교체 (번역이 잘 되도록)
+                preprocessed_text = preprocessed_text.replace(
+                    source_term, f"{target_term}"
+                )
+        return preprocessed_text
+
+    def retrieve_text_with_domain(
+        self,
+        text: str,
+        domain: Optional[str] = None,
+        max_terms: int = 3,  # 🔧 조정 가능하게
+    ) -> str:
+        # 1. 도메인별 관련 용어 검색
+        retrieved_terms = self.retrieve_terminology(text, domain=domain)
+
+        if not retrieved_terms:
+            return text  # 용어가 없으면 원본 반환
+
+        # 더 자연스러운 프롬프트 구성
+        terminology_context = ", ".join(
+            [
+                f"'{source}' → '{target}'"
+                for source, target, _, _ in retrieved_terms[:max_terms]
+            ]
+        )
+
+        context_text = f"""{terminology_context}"""
 
         return context_text

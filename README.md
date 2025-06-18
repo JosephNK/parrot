@@ -32,6 +32,7 @@ poetry install
 poetry run python scripts/download_models.py --model nllb-200
 poetry run python scripts/download_models.py --model m2m-100-1.2b
 poetry run python scripts/download_models.py --model hyperclova-1.5b
+poetry run python scripts/download_models.py --model qwen2.5-1.5b
 ```
 
 ### Translate
@@ -40,6 +41,11 @@ poetry run python scripts/download_models.py --model hyperclova-1.5b
 poetry run python scripts/test.py --translate "안녕하세요. 오늘 날씨가 정말 좋네요." ko2ja --model nllb-200
 poetry run python scripts/test.py --translate "안녕하세요. 오늘 날씨가 정말 좋네요." ko2ja --model m2m-100-1.2b
 poetry run python scripts/test.py --translate "안녕하세요. 오늘 날씨가 정말 좋네요." ko2ja --model hyperclova-1.5b
+poetry run python scripts/test.py --translate "안녕하세요. 오늘 날씨가 정말 좋네요." ko2ja --model qwen2.5-1.5b
+poetry run python scripts/test.py --translate "재이미샵 포카 굿즈 일괄 원가 양도 판매합니다." ko2ja --model nllb-200
+poetry run python scripts/test.py --translate "재이미샵 포카 굿즈 일괄 원가 양도 판매합니다." ko2ja --model m2m-100-1.2b
+poetry run python scripts/test.py --translate "재이미샵 포카 굿즈 일괄 원가 양도 판매합니다." ko2ja --model hyperclova-1.5b
+poetry run python scripts/test.py --translate "재이미샵 포카 굿즈 일괄 원가 양도 판매합니다." ko2ja --model qwen2.5-1.5b
 ```
 
 ### Info

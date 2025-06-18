@@ -1,5 +1,5 @@
 """
-HyperCLOVAX Model Module
+Qwen Model Module
 
 """
 
@@ -11,8 +11,8 @@ from ._translation_model import TranslationModel
 from ..config import config
 
 
-class HyperCLOVAXTranslationModel(TranslationModel):
-    """HyperCLOVAX 모델 전용 클래스"""
+class QwenTranslationModel(TranslationModel):
+    """Qwen 모델 전용 클래스"""
 
     def __init__(self, model_name: str):
         super().__init__(model_name)
@@ -22,9 +22,9 @@ class HyperCLOVAXTranslationModel(TranslationModel):
 
     def lang_code_to_id(self, lang: str) -> str:
         return {
-            "korean": "한국어",
-            "japanese": "일본어",
-            "english": "영어",
+            "korean": "korean",
+            "japanese": "japanese",
+            "english": "english",
         }.get(lang, lang)
 
     def vaidate_lang(
@@ -54,21 +54,20 @@ class HyperCLOVAXTranslationModel(TranslationModel):
 
             # Chat template 구성
             chat = [
-                {"role": "tool_list", "content": ""},
                 {
                     "role": "system",
-                    "content": f"""AI 언어모델의 이름은 "CLOVA X" 이며 네이버에서 만들었다.
-- 당신은 {self.source_code}을 {self.target_code}로 번역하는 번역가입니다. 
-""",
+                    "content": "You are Qwen, created by Alibaba Cloud. You are a professional translator. Translate the given text accurately and naturally.",
                 },
                 {
                     "role": "user",
-                    "content": f"""1번만 번역하세요:
-1. {text}
+                    "content": f"""Translate {self.source_code} to {self.target_code}:
 
-2. 참고용어: {terminology_hint}
+{text}
 
-1번을 {self.target_code}로 번역:""",
+[Terms] 
+{terminology_hint}
+
+Output {self.target_code} translation only:""",
                 },
             ]
 
@@ -84,11 +83,11 @@ class HyperCLOVAXTranslationModel(TranslationModel):
             with torch.no_grad():
                 outputs = self.model.generate(
                     **inputs,
-                    max_length=self.max_length,
-                    stop_strings=[
-                        "<|endofturn|>",
-                        "<|stop|>",
-                    ],
+                    max_new_tokens=self.max_length,
+                    do_sample=True,
+                    temperature=0.3,
+                    top_p=0.8,
+                    pad_token_id=self.tokenizer.eos_token_id,
                     tokenizer=self.tokenizer,
                     **generate_kwargs,
                 )

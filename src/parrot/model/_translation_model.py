@@ -7,6 +7,7 @@ import torch
 from abc import ABC, abstractmethod
 from typing import Optional, Dict, Any
 
+from ._translation_rag_model import TranslationRagModel
 from ._loader_model import LoaderModel
 from ..config import config
 
@@ -18,7 +19,6 @@ class TranslationModel(ABC):
         """
         Args:
             model_name: Hugging Face 모델 이름
-            use_rag: RAG 사용 여부 (선택사항, 기본값: True)
         """
         self.model_name = model_name
         self.tokenizer = None
@@ -30,11 +30,16 @@ class TranslationModel(ABC):
         self.num_beams = num_beams
 
     def load_model(self, auth_token: Optional[str] = None, **kwargs) -> None:
+        # Load the model and tokenizer from Hugging Face
         auto_model = LoaderModel(self.model_name, auth_token)
         auto_model.load_model(**kwargs)
         self.model_name = auto_model.model_name
         self.tokenizer = auto_model.tokenizer
         self.model = auto_model.model
+
+        # Set the model to evaluation mode
+        self.rag_model = TranslationRagModel()
+        self.rag_model.load_terminology_db()
 
     def vaidate_model(self) -> None:
         if not self.model or not self.tokenizer:
@@ -68,6 +73,10 @@ class TranslationModel(ABC):
             "supported_languages": list(config.LANGUAGE_CODES),
         }
 
+    def print_generation_config(self) -> None:
+        gen_config = self.model.generation_config
+        print(f"✓ Generation config: {gen_config}")
+
     @abstractmethod
     def lang_code_to_id(self, lang: str) -> str:
         """
@@ -88,10 +97,6 @@ class TranslationModel(ABC):
         target_lang: str,
     ) -> None:
         pass
-
-    # @abstractmethod
-    # def tokenizer_to_inputs(self) -> Any:
-    #     pass
 
     @abstractmethod
     def translate(

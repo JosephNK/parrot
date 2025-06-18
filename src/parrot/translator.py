@@ -11,7 +11,7 @@ from .model import (
     M2MTranslationModel,
     MBartTranslationModel,
     NLLBTranslationModel,
-    OpusTranslationModel,
+    QwenTranslationModel,
 )
 from .config import config
 
@@ -51,10 +51,10 @@ class KoreanJapaneseTranslator:
             self.model = M2MTranslationModel(model_name)
         elif "mbart" in model_name.lower():
             self.model = MBartTranslationModel(model_name)
-        elif "opus" in model_name.lower():
-            self.model = OpusTranslationModel(model_name)
         elif "hyperclova" in model_name.lower():
             self.model = HyperCLOVAXTranslationModel(model_name)
+        elif "qwen" in model_name.lower():
+            self.model = QwenTranslationModel(model_name)
 
         if auto_load:
             self.model.load_model()
