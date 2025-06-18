@@ -62,6 +62,54 @@ poetry run python scripts/test.py --performance --model nllb-200
 poetry run python scripts/test.py --performance --model m2m-100-1.2b
 ```
 
+Example
+```
+🚀 Performance Test
+==================================================
+📥 Testing model: m2m-100-1.2b
+Loading model (seq2seqlm): facebook/m2m100_1.2B
+Using device: mps
+✓ Tokenizer loaded
+✓ Model loaded successfully.
+✓ FAISS loaded successfully.
+✓ Terminology database loaded: 12 terms
+
+📊 Performance Results:
+------------------------------
+✓ Translating from 'ko' to 'ja'...
+🎯 짧은 문장:
+  Input: 안녕
+  Output: おはよう
+  Time: 0.800s
+  Speed: 2.5 chars/sec
+
+✓ Translating from 'ko' to 'ja'...
+🎯 중간 문장:
+  Input: 오늘 날씨가 정말 좋네요
+  Output: 今日は天気いいね。
+  Time: 1.096s
+  Speed: 11.9 chars/sec
+
+✓ Translating from 'ko' to 'ja'...
+🎯 긴 문장:
+  Input: 파이썬을 사용해서 허깅페이스 모델로 한국어와 일본어 번역기를 만들고 있습니다
+  Output: Pythonを使用して、ハッキングフェイスモデルとして韓国語と日本語の翻訳機を作っています
+  Time: 1.791s
+  Speed: 23.5 chars/sec
+
+✓ Translating from 'ko' to 'ja'...
+🎯 복잡한 문장:
+  Input: 저는 서울에 살고 있는 대학생이며, 인공지능과 자연어 처리에 관심이 많습니다
+  Output: 私はソウルに住む大学生で、人工知能と自然言語処理に興味があります。
+  Time: 1.442s
+  Speed: 29.1 chars/sec
+
+📈 Overall Performance:
+  Total time: 5.128s
+  Total characters: 99
+  Average speed: 19.3 chars/sec
+```
+
 ### Model Info
 
 ```bash
@@ -69,10 +117,83 @@ poetry run python scripts/test.py --info --model nllb-200
 poetry run python scripts/test.py --info --model m2m-100-1.2b
 ```
 
+Example
+```
+Loading model (seq2seqlm): facebook/m2m100_1.2B
+Using device: mps
+✓ Tokenizer loaded
+✓ Model loaded successfully.
+✓ FAISS loaded successfully.
+✓ Terminology database loaded: 12 terms
+ℹ️  Translation Model Information
+==================================================
+Model: facebook/m2m100_1.2B
+Device: mps
+Languages: korean, japanese, english
+Directions: Korean → Japanese, Japanese → Korean
+==================================================
+
+📋 Available Models:
+nllb-200: {'name': 'facebook/nllb-200-distilled-600M', 'transformer': 'seq2seqlm'}
+m2m-100-1.2b: {'name': 'facebook/m2m100_1.2B', 'transformer': 'seq2seqlm'}
+...
+```
+
 ### Benchmark Models
 
 ```bash
 poetry run python scripts/test.py --benchmark
+```
+
+Example
+```
+⚡ Model Benchmark
+==================================================
+
+🔍 Testing: nllb-200
+----------------------------------------
+Loading model (seq2seqlm): facebook/nllb-200-distilled-600M
+Using device: mps
+✓ Tokenizer loaded
+✓ Model loaded successfully.
+✓ FAISS loaded successfully.
+✓ Terminology database loaded: 12 terms
+✓ Translating from 'kor_Hang' to 'jpn_Jpan'...
+🇰🇷 Korean: 안녕하세요. 오늘 날씨가 좋네요.
+✓ Translation completed: こんにちは. 今日は良い天気です
+⏱️  Load: 7.97s, Translate: 1.31s
+
+✓ Translating from 'jpn_Jpan' to 'kor_Hang'...
+🇯🇵 Japanese: こんにちは。今日はいい天気ですね。
+✓ Translation completed: 안녕, 안녕. 오늘 좋은 날씨입니다.
+⏱️  Load: 7.97s, Translate: 0.63s
+
+
+🔍 Testing: m2m-100-1.2b
+----------------------------------------
+Loading model (seq2seqlm): facebook/m2m100_1.2B
+Using device: mps
+✓ Tokenizer loaded
+✓ Model loaded successfully.
+✓ Terminology database loaded: 12 terms
+✓ Translating from 'ko' to 'ja'...
+🇰🇷 Korean: 안녕하세요. 오늘 날씨가 좋네요.
+✓ Translation completed: こんにちは!今日はいい天気です。
+⏱️  Load: 8.29s, Translate: 0.99s
+
+✓ Translating from 'ja' to 'ko'...
+🇯🇵 Japanese: こんにちは。今日はいい天気ですね。
+✓ Translation completed: 안녕하세요 오늘은 좋은 날씨입니다.
+⏱️  Load: 8.29s, Translate: 0.65s
+
+
+📊 Benchmark Summary:
+==================================================
+nllb-200 (ko2ja): Load 7.97s, Translate 1.31s
+nllb-200 (ja2ko): Load 7.97s, Translate 0.63s
+m2m-100-1.2b (ko2ja): Load 8.29s, Translate 0.99s
+m2m-100-1.2b (ja2ko): Load 8.29s, Translate 0.65s
+...
 ```
 
 ### API

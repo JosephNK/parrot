@@ -19,7 +19,6 @@ class LoaderModel:
             model_name: Hugging Face 모델 이름
             auth_token: Hugging Face 인증 토큰 (선택사항)
         """
-        print("model_info:", model_info)
         self.model_info = model_info
         self.tokenizer = None
         self.model = None

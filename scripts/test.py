@@ -315,10 +315,14 @@ def custom_translation(text: str, direction: str, model: str = None) -> None:
         traceback.print_exc()
 
 
-def show_model_info() -> None:
+def show_model_info(model_name: str = None) -> None:
     """모델 정보 표시"""
     try:
-        translator = KoreanJapaneseTranslator()
+        if model_name:
+            translator = KoreanJapaneseTranslator(model_name=model_name)
+        else:
+            translator = KoreanJapaneseTranslator()
+
         info = translator.get_info()
 
         print("ℹ️  Translation Model Information")
@@ -466,7 +470,7 @@ Examples:
     elif args.benchmark:
         benchmark_models()
     elif args.info:
-        show_model_info()
+        show_model_info(args.model)
     elif args.performance:
         performance_test(args.model)
     else:
