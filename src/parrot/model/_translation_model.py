@@ -15,12 +15,12 @@ from ..config import config
 class TranslationModel(ABC):
     """번역 모델 클래스"""
 
-    def __init__(self, model_name: str):
+    def __init__(self, model_info: Dict[str, Dict[str, str]]):
         """
         Args:
-            model_name: Hugging Face 모델 이름
+            model_info: Hugging Face 모델 {"name": str, "transformer": str}
         """
-        self.model_name = model_name
+        self.model_info = model_info
         self.tokenizer = None
         self.model = None
         self.device = self._get_device()
@@ -31,7 +31,7 @@ class TranslationModel(ABC):
 
     def load_model(self, auth_token: Optional[str] = None, **kwargs) -> None:
         # Load the model and tokenizer from Hugging Face
-        auto_model = LoaderModel(self.model_name, auth_token)
+        auto_model = LoaderModel(self.model_info, auth_token)
         auto_model.load_model(**kwargs)
         self.model_name = auto_model.model_name
         self.tokenizer = auto_model.tokenizer
@@ -67,7 +67,7 @@ class TranslationModel(ABC):
 
     def get_model_info(self) -> Dict[str, Any]:
         return {
-            "model_name": self.model_name,
+            "model_name": self.model_info["name"],
             "device": self.device,
             "is_loaded": self.model is not None,
             "supported_languages": list(config.LANGUAGE_CODES),

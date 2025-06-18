@@ -55,10 +55,24 @@ poetry run python scripts/test.py --translate "재이미샵 포카 굿즈 일괄
 poetry run python scripts/test.py --translate "재이미샵 포카 굿즈 일괄 원가 양도 판매합니다." ko2ja --model varco-8b
 ```
 
-### Info
+### Model Performance
 
 ```bash
-poetry run python scripts/test.py --info
+poetry run python scripts/test.py --performance --model nllb-200
+poetry run python scripts/test.py --performance --model m2m-100-1.2b
+```
+
+### Model Info
+
+```bash
+poetry run python scripts/test.py --info --model nllb-200
+poetry run python scripts/test.py --info --model m2m-100-1.2b
+```
+
+### Benchmark Models
+
+```bash
+poetry run python scripts/test.py --benchmark
 ```
 
 ### API

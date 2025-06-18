@@ -4,18 +4,17 @@ NLLB Model Module
 """
 
 import torch
-from typing import Optional
+from typing import Dict
 
 from ..exception.exception import TranslationError, TranslationErrorCode
 from ._translation_model import TranslationModel
-from ..config import config
 
 
 class NLLBTranslationModel(TranslationModel):
     """NLLB 모델 전용 클래스"""
 
-    def __init__(self, model_name: str):
-        super().__init__(model_name)
+    def __init__(self, model_info: Dict[str, Dict[str, str]]):
+        super().__init__(model_info)
 
     def lang_code_to_id(self, lang: str) -> str:
         return {

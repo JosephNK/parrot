@@ -28,12 +28,30 @@ class Config:
 
     # 지원 모델 목록
     SUPPORTED_MODELS = {
-        "nllb-200": "facebook/nllb-200-distilled-600M",
-        "m2m-100-1.2b": "facebook/m2m100_1.2B",
-        "mbart-50": "facebook/mbart-large-50-many-to-many-mmt",
-        "qwen2.5-1.5b": "Qwen/Qwen2.5-1.5B-Instruct",
-        "hyperclova-1.5b": "naver-hyperclovax/HyperCLOVAX-SEED-Text-Instruct-1.5B",
-        "varco-8b": "NCSOFT/Llama-VARCO-8B-Instruct",
+        "nllb-200": {
+            "name": "facebook/nllb-200-distilled-600M",
+            "transformer": "seq2seqlm",
+        },
+        "m2m-100-1.2b": {
+            "name": "facebook/m2m100_1.2B",
+            "transformer": "seq2seqlm",
+        },
+        "mbart-50": {
+            "name": "facebook/mbart-large-50-many-to-many-mmt",
+            "transformer": "seq2seqlm",
+        },
+        "qwen2.5-1.5b": {
+            "name": "Qwen/Qwen2.5-1.5B-Instruct",
+            "transformer": "causallm",
+        },
+        "hyperclova-1.5b": {
+            "name": "naver-hyperclovax/HyperCLOVAX-SEED-Text-Instruct-1.5B",
+            "transformer": "causallm",
+        },
+        "varco-8b": {
+            "name": "NCSOFT/Llama-VARCO-8B-Instruct",
+            "transformer": "causallm",
+        },
     }
 
     # 지원하는 언어 코드

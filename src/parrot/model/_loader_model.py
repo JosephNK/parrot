@@ -9,16 +9,24 @@ from ..config import config
 class LoaderModel:
     """모델 Loader 클래스"""
 
-    def __init__(self, model_name: str, auth_token: Optional[str] = None):
+    def __init__(
+        self,
+        model_info: Dict[str, Dict[str, str]],
+        auth_token: Optional[str] = None,
+    ):
         """
         Args:
             model_name: Hugging Face 모델 이름
             auth_token: Hugging Face 인증 토큰 (선택사항)
         """
-        self.model_name = model_name
+        print("model_info:", model_info)
+        self.model_info = model_info
         self.tokenizer = None
         self.model = None
         self.device = self.__get_device()
+
+        self.model_name = self.model_info["name"]
+        self.transformer = self.model_info["transformer"]
 
         # 인증이 필요한 경우 로그인
         if auth_token:
@@ -27,15 +35,12 @@ class LoaderModel:
             login(token=config.get_huggingface_token())
 
     def load_model(self, **kwargs) -> None:
-        if any(
-            keyword in self.model_name.lower()
-            for keyword in ["hyperclova", "qwen", "varco"]
-        ):
-            # CausalLM
-            self.__load_model_causallm(**kwargs)
-        else:
+        if self.transformer == "seq2seqlm":
             # Seq2SeqLM
             self.__load_model_seq2seqlm(**kwargs)
+        else:
+            # CausalLM
+            self.__load_model_causallm(**kwargs)
 
     def __load_model_seq2seqlm(self, **kwargs) -> None:
         """Seq2SeqLM 모델 로드"""

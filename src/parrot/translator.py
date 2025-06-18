@@ -7,6 +7,7 @@ Korean-Japanese Translator Module
 from typing import Optional, List, Dict, Any
 
 from .model import (
+    TranslationModel,
     HyperCLOVAXTranslationModel,
     M2MTranslationModel,
     MBartTranslationModel,
@@ -31,6 +32,7 @@ class KoreanJapaneseTranslator:
             auth_token: Hugging Face 인증 토큰
             auto_load: 초기화 시 자동으로 모델 로드
         """
+        self.model: TranslationModel
         self.model = None
         self.model_name = model_name
         self.load_model(model_name, auto_load)
@@ -41,23 +43,23 @@ class KoreanJapaneseTranslator:
         auto_load: bool = True,
     ) -> None:
         if model_name is None:
-            model_name = config.SUPPORTED_MODELS["nllb-200"]
+            model_info = config.SUPPORTED_MODELS["nllb-200"]
         elif model_name in config.SUPPORTED_MODELS:
-            model_name = config.SUPPORTED_MODELS[model_name]
+            model_info = config.SUPPORTED_MODELS[model_name]
 
-        # 모델 타입에 따라 적절한 클래스 선택
-        if "nllb" in model_name.lower():
-            self.model = NLLBTranslationModel(model_name)
-        elif "m2m" in model_name.lower():
-            self.model = M2MTranslationModel(model_name)
-        elif "mbart" in model_name.lower():
-            self.model = MBartTranslationModel(model_name)
-        elif "hyperclova" in model_name.lower():
-            self.model = HyperCLOVAXTranslationModel(model_name)
-        elif "qwen" in model_name.lower():
-            self.model = QwenTranslationModel(model_name)
-        elif "varco" in model_name.lower():
-            self.model = VarcoTranslationModel(model_name)
+        model_mapping: Dict[str, TranslationModel] = {
+            "nllb": NLLBTranslationModel,
+            "m2m": M2MTranslationModel,
+            "mbart": MBartTranslationModel,
+            "hyperclova": HyperCLOVAXTranslationModel,
+            "qwen": QwenTranslationModel,
+            "varco": VarcoTranslationModel,
+        }
+
+        for key, model_class in model_mapping.items():
+            if key in model_info["name"].lower():
+                self.model = model_class(model_info)
+                break
 
         if auto_load:
             self.model.load_model()
@@ -221,6 +223,6 @@ class KoreanJapaneseTranslator:
         }
 
     @classmethod
-    def list_models(cls) -> Dict[str, str]:
+    def list_models(cls) -> Dict[str, Dict[str, str]]:
         """사용 가능한 모델 목록 반환"""
         return config.SUPPORTED_MODELS.copy()

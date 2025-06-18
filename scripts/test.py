@@ -17,6 +17,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root / "src"))
 
 from parrot import KoreanJapaneseTranslator
+from parrot.config import config
 
 
 def demo_translation() -> None:
@@ -200,21 +201,25 @@ def benchmark_models() -> None:
 
     # 테스트할 모델들
     models_to_test = [
-        ("NLLB-200", "facebook/nllb-200-distilled-600M"),
-        ("Opus KO-JA", "Helsinki-NLP/opus-mt-ko-jap"),
-        ("Opus JA-KO", "Helsinki-NLP/opus-mt-jap-ko"),
-        ("HyperCLOVA-0.5B", "naver-hyperclovax/HyperCLOVAX-SEED-Text-Instruct-0.5B"),
-        ("HyperCLOVA-1.5B", "naver-hyperclovax/HyperCLOVAX-SEED-Text-Instruct-1.5B"),
+        (key, model_info["name"], model_info["transformer"])
+        for key, model_info in config.SUPPORTED_MODELS.items()
     ]
 
+    models_to_test = [
+        (key, name, transformer)
+        for key, name, transformer in models_to_test
+        if key not in ["hyperclova-1.5b", "varco-8b"]
+    ]
+
+    # 테스트할 문장들
     test_sentences = [
-        ("한국어", "안녕하세요. 오늘 날씨가 좋네요.", "ko2ja"),
-        ("일본어", "こんにちは。今日はいい天気ですね。", "ja2ko"),
+        ("🇰🇷 Korean", "안녕하세요. 오늘 날씨가 좋네요.", "ko2ja"),
+        ("🇯🇵 Japanese", "こんにちは。今日はいい天気ですね。", "ja2ko"),
     ]
 
     results = []
 
-    for model_name, model_path in models_to_test:
+    for model_name, _, _ in models_to_test:
         print(f"\n🔍 Testing: {model_name}")
         print("-" * 40)
 
@@ -222,96 +227,35 @@ def benchmark_models() -> None:
             # 모델 로딩 시간 측정
             load_start = time.time()
 
-            if "opus-mt-ko-jap" in model_path:
-                # 한국어 → 일본어만 테스트
-                translator = KoreanJapaneseTranslator(model_name=model_path)
-                load_time = time.time() - load_start
+            # 양방향 번역 가능
+            translator = KoreanJapaneseTranslator(model_name=model_name)
+            load_time = time.time() - load_start
 
-                for lang, sentence, direction in test_sentences:
-                    if direction == "ko2ja":
-                        start_time = time.time()
-                        result = translator.ko2ja(sentence)
-                        translate_time = time.time() - start_time
+            for lang, sentence, direction in test_sentences:
+                start_time = time.time()
 
-                        print(f"{lang}: {sentence}")
-                        print(f"Result: {result}")
-                        print(
-                            f"⏱️  Load: {load_time:.2f}s, Translate: {translate_time:.2f}s"
-                        )
+                if direction == "ko2ja":
+                    result = translator.ko2ja(sentence)
+                else:
+                    result = translator.ja2ko(sentence)
 
-                        results.append(
-                            {
-                                "model": model_name,
-                                "direction": direction,
-                                "load_time": load_time,
-                                "translate_time": translate_time,
-                                "input": sentence,
-                                "output": result,
-                            }
-                        )
-                        break
+                translate_time = time.time() - start_time
 
-            elif "opus-mt-jap-ko" in model_path:
-                # 일본어 → 한국어만 테스트
-                translator = KoreanJapaneseTranslator(model_name=model_path)
-                load_time = time.time() - load_start
+                print(f"{lang}: {sentence}")
+                print(f"✓ Translation completed: {result}")
+                print(f"⏱️  Load: {load_time:.2f}s, Translate: {translate_time:.2f}s")
+                print()
 
-                for lang, sentence, direction in test_sentences:
-                    if direction == "ja2ko":
-                        start_time = time.time()
-                        result = translator.ja2ko(sentence)
-                        translate_time = time.time() - start_time
-
-                        print(f"{lang}: {sentence}")
-                        print(f"Result: {result}")
-                        print(
-                            f"⏱️  Load: {load_time:.2f}s, Translate: {translate_time:.2f}s"
-                        )
-
-                        results.append(
-                            {
-                                "model": model_name,
-                                "direction": direction,
-                                "load_time": load_time,
-                                "translate_time": translate_time,
-                                "input": sentence,
-                                "output": result,
-                            }
-                        )
-                        break
-
-            else:
-                # 양방향 번역 가능
-                translator = KoreanJapaneseTranslator(model_name=model_path)
-                load_time = time.time() - load_start
-
-                for lang, sentence, direction in test_sentences:
-                    start_time = time.time()
-
-                    if direction == "ko2ja":
-                        result = translator.ko2ja(sentence)
-                    else:
-                        result = translator.ja2ko(sentence)
-
-                    translate_time = time.time() - start_time
-
-                    print(f"{lang}: {sentence}")
-                    print(f"Result: {result}")
-                    print(
-                        f"⏱️  Load: {load_time:.2f}s, Translate: {translate_time:.2f}s"
-                    )
-                    print()
-
-                    results.append(
-                        {
-                            "model": model_name,
-                            "direction": direction,
-                            "load_time": load_time,
-                            "translate_time": translate_time,
-                            "input": sentence,
-                            "output": result,
-                        }
-                    )
+                results.append(
+                    {
+                        "model": model_name,
+                        "direction": direction,
+                        "load_time": load_time,
+                        "translate_time": translate_time,
+                        "input": sentence,
+                        "output": result,
+                    }
+                )
 
         except Exception as e:
             print(f"❌ Error testing {model_name}: {e}")
@@ -383,7 +327,6 @@ def show_model_info() -> None:
         print(f"Device: {info['device']}")
         print(f"Languages: {', '.join(info['supported_languages'])}")
         print(f"Directions: {', '.join(info['supported_directions'])}")
-
         print("=" * 50)
         print("\n📋 Available Models:")
         for key, model_name in info["supported_models"].items():
@@ -408,8 +351,14 @@ def performance_test(model_name: str = None) -> None:
 
         # 다양한 길이의 문장 테스트
         test_cases = [
-            ("짧은 문장", "안녕"),
-            ("중간 문장", "오늘 날씨가 정말 좋네요"),
+            (
+                "짧은 문장",
+                "안녕",
+            ),
+            (
+                "중간 문장",
+                "오늘 날씨가 정말 좋네요",
+            ),
             (
                 "긴 문장",
                 "파이썬을 사용해서 허깅페이스 모델로 한국어와 일본어 번역기를 만들고 있습니다",
@@ -437,7 +386,7 @@ def performance_test(model_name: str = None) -> None:
             total_time += duration
             total_chars += len(text)
 
-            print(f"{desc}:")
+            print(f"🎯 {desc}:")
             print(f"  Input: {text}")
             print(f"  Output: {result}")
             print(f"  Time: {duration:.3f}s")

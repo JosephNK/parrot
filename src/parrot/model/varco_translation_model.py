@@ -3,19 +3,18 @@ Varco Model Module
 
 """
 
-import re
+from typing import Dict
 import torch
 
 from ..exception.exception import TranslationError, TranslationErrorCode
 from ._translation_model import TranslationModel
-from ..config import config
 
 
 class VarcoTranslationModel(TranslationModel):
     """Varco 모델 전용 클래스"""
 
-    def __init__(self, model_name: str):
-        super().__init__(model_name)
+    def __init__(self, model_info: Dict[str, Dict[str, str]]):
+        super().__init__(model_info)
 
         # 이 특정 모델에 맞게 max_length 조정
         self.max_length = min(self.max_length * 5, 8192)
