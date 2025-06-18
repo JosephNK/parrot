@@ -12,6 +12,7 @@ from .model import (
     MBartTranslationModel,
     NLLBTranslationModel,
     QwenTranslationModel,
+    VarcoTranslationModel,
 )
 from .config import config
 
@@ -55,6 +56,8 @@ class KoreanJapaneseTranslator:
             self.model = HyperCLOVAXTranslationModel(model_name)
         elif "qwen" in model_name.lower():
             self.model = QwenTranslationModel(model_name)
+        elif "varco" in model_name.lower():
+            self.model = VarcoTranslationModel(model_name)
 
         if auto_load:
             self.model.load_model()

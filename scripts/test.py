@@ -86,7 +86,7 @@ def demo_translation() -> None:
             print(f"KO: {ko} → JA: {ja}")
         print(f"⏱️  Batch time: {batch_time:.2f}s")
 
-        print("\n✅ Demo completed successfully!")
+        print("\n✅ Demo completed successfully.")
 
     except Exception as e:
         print(f"❌ Error during demo: {e}")

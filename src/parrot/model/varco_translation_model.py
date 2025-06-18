@@ -1,5 +1,5 @@
 """
-HyperCLOVAX Model Module
+Varco Model Module
 
 """
 
@@ -11,14 +11,14 @@ from ._translation_model import TranslationModel
 from ..config import config
 
 
-class HyperCLOVAXTranslationModel(TranslationModel):
-    """HyperCLOVAX 모델 전용 클래스"""
+class VarcoTranslationModel(TranslationModel):
+    """Varco 모델 전용 클래스"""
 
     def __init__(self, model_name: str):
         super().__init__(model_name)
 
         # 이 특정 모델에 맞게 max_length 조정
-        self.max_length = min(self.max_length * 2, 1024)
+        self.max_length = min(self.max_length * 5, 8192)
 
     def lang_code_to_id(self, lang: str) -> str:
         return {
@@ -61,19 +61,23 @@ class HyperCLOVAXTranslationModel(TranslationModel):
                 {
                     "role": "system",
                     "content": f"""
-당신은 {self.source_code}을 {self.target_code}로 번역하는 전문 번역가입니다. 
+You are a professional {self.source_code}-{self.target_code} translator. 
+Translate the given text accurately and naturally.
+
+**Output Format:**
+Provide only the translation result without additional explanations.
 """.strip(),
                 },
                 {
                     "role": "user",
                     "content": f"""
-1번만 번역하세요:
+Translate {self.source_code} to {self.target_code}:
+{text}
 
-1. {text}
+**Terms:**
+{terminology_hint}
 
-2. 참고용어: {terminology_hint}
-
-1번을 {self.target_code}로 번역
+Output {self.target_code} translation only.
 """.strip(),
                 },
             ]
@@ -94,9 +98,9 @@ class HyperCLOVAXTranslationModel(TranslationModel):
                 outputs = self.model.generate(
                     **inputs,
                     max_length=self.max_length,
-                    stop_strings=[
-                        "<|endofturn|>",
-                        "<|stop|>",
+                    eos_token_id=[
+                        self.tokenizer.eos_token_id,
+                        self.tokenizer.convert_tokens_to_ids("<|eot_id|>"),
                     ],
                     **generate_kwargs,
                 )
@@ -106,13 +110,6 @@ class HyperCLOVAXTranslationModel(TranslationModel):
             translated_text = self.tokenizer.decode(
                 generated_tokens, skip_special_tokens=True
             ).strip()
-
-            # 불필요한 부분 정리
-            if "<|endofturn|>" in translated_text:
-                translated_text = translated_text.split("<|endofturn|>")[0].strip()
-
-            # 백틱과 불필요한 줄바꿈 제거
-            translated_text = re.sub(r"```[\r\n]*|[\r\n]*```", "", translated_text)
 
             print(f"✓ Translation completed: {translated_text}")
 

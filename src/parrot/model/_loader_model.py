@@ -28,7 +28,8 @@ class LoaderModel:
 
     def load_model(self, **kwargs) -> None:
         if any(
-            keyword in self.model_name.lower() for keyword in ["hyperclova", "qwen"]
+            keyword in self.model_name.lower()
+            for keyword in ["hyperclova", "qwen", "varco"]
         ):
             # CausalLM
             self.__load_model_causallm(**kwargs)
@@ -63,7 +64,7 @@ class LoaderModel:
             if self.device != "cpu":
                 self.model = self.model.to(self.device)
 
-            print("✓ Model loaded successfully!")
+            print("✓ Model loaded successfully.")
 
         except Exception as e:
             print(f"✗ Error loading model: {e}")
@@ -95,7 +96,7 @@ class LoaderModel:
             if self.device != "cpu":
                 self.model = self.model.to(self.device)
 
-            print("✓ Model loaded successfully!")
+            print("✓ Model loaded successfully.")
 
         except Exception as e:
             print(f"✗ Error loading model: {e}")

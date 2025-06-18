@@ -33,6 +33,7 @@ class Config:
         "mbart-50": "facebook/mbart-large-50-many-to-many-mmt",
         "qwen2.5-1.5b": "Qwen/Qwen2.5-1.5B-Instruct",
         "hyperclova-1.5b": "naver-hyperclovax/HyperCLOVAX-SEED-Text-Instruct-1.5B",
+        "varco-8b": "NCSOFT/Llama-VARCO-8B-Instruct",
     }
 
     # 지원하는 언어 코드

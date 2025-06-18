@@ -13,10 +13,10 @@ Faiss = None
 def lazyFaiss():
     global Faiss
     if Faiss is None:
-        print("FAISS 모듈 로딩 중...")
         import faiss
 
         Faiss = faiss
+        print("✓ FAISS loaded successfully.")
     return Faiss
 
 
@@ -95,7 +95,7 @@ class TranslationRagModel:
             self.term_embeddings = embeddings_normalized
             self.term_pairs = all_pairs
 
-        print(f"Terminology database loaded: {len(self.term_pairs)} terms")
+        print(f"✓ Terminology database loaded: {len(self.term_pairs)} terms")
 
     def retrieve_terminology(
         self,

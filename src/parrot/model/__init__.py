@@ -6,6 +6,7 @@ from .m2m_translation_model import M2MTranslationModel
 from .mbart_translation_model import MBartTranslationModel
 from .nllb_translation_model import NLLBTranslationModel
 from .qwen_translation_model import QwenTranslationModel
+from .varco_translation_model import VarcoTranslationModel
 
 __all__ = [
     "LoaderModel",
@@ -16,4 +17,5 @@ __all__ = [
     "MBartTranslationModel",
     "NLLBTranslationModel",
     "QwenTranslationModel",
+    "VarcoTranslationModel",
 ]
