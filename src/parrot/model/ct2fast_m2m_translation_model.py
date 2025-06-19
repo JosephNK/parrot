@@ -1,5 +1,5 @@
 """
-MBart Model Module
+CT2FastM2M Model Module
 
 """
 
@@ -10,17 +10,17 @@ from ..exception.exception import TranslationError, TranslationErrorCode
 from ._translation_model import TranslationModel
 
 
-class MBartTranslationModel(TranslationModel):
-    """MBart 모델 전용 클래스"""
+class CT2FastM2MTranslationModel(TranslationModel):
+    """CT2FastM2M 모델 전용 클래스"""
 
     def __init__(self, model_info: Dict[str, Dict[str, str]]):
         super().__init__(model_info)
 
     def lang_code_to_id(self, lang: str) -> str:
         return {
-            "korean": "ko_KR",
-            "japanese": "ja_XX",
-            "english": "en_XX",
+            "korean": "ko",
+            "japanese": "ja",
+            "english": "en",
         }.get(lang, lang)
 
     def vaidate_lang(
@@ -52,30 +52,16 @@ class MBartTranslationModel(TranslationModel):
                 ),
             )
 
-            # MBart 모델은 src_lang을 토크나이저 속성으로 설정
-            self.tokenizer.src_lang = self.source_code
-            inputs = self.tokenizer(text, return_tensors="pt")
-
-            # 디바이스로 이동
-            inputs = self.move_inputs_to_device(inputs)
-
             # 번역 생성
             with torch.no_grad():
                 outputs = self.model.generate(
-                    inputs["input_ids"],
-                    forced_bos_token_id=self.tokenizer.lang_code_to_id[
-                        self.target_code
-                    ],
-                    max_length=self.max_length,
-                    num_beams=self.num_beams,
-                    early_stopping=True,
-                    **generate_kwargs,
+                    [text],
+                    src_lang=[self.source_code],
+                    tgt_lang=[self.target_code],
                 )
 
             # 결과 처리
-            translated_text = self.tokenizer.decode(
-                outputs[0], skip_special_tokens=True
-            )
+            translated_text = outputs[0]
 
             return translated_text
 

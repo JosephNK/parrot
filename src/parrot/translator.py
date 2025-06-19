@@ -8,6 +8,7 @@ from typing import Optional, List, Dict, Any
 
 from .model import (
     TranslationModel,
+    CT2FastM2MTranslationModel,
     HyperCLOVAXTranslationModel,
     M2MTranslationModel,
     MBartTranslationModel,
@@ -48,16 +49,17 @@ class KoreanJapaneseTranslator:
             model_info = config.SUPPORTED_MODELS[model_name]
 
         model_mapping: Dict[str, TranslationModel] = {
-            "nllb": NLLBTranslationModel,
-            "m2m": M2MTranslationModel,
-            "mbart": MBartTranslationModel,
-            "hyperclova": HyperCLOVAXTranslationModel,
-            "qwen": QwenTranslationModel,
-            "varco": VarcoTranslationModel,
+            "nllb-200": NLLBTranslationModel,
+            "ct2fast-m2m-100_1.2b": CT2FastM2MTranslationModel,
+            "m2m-100-1.2b": M2MTranslationModel,
+            "mbart-50": MBartTranslationModel,
+            "hyperclova-1.5b": HyperCLOVAXTranslationModel,
+            "qwen2.5-1.5b": QwenTranslationModel,
+            "varco-8b": VarcoTranslationModel,
         }
 
         for key, model_class in model_mapping.items():
-            if key in model_info["name"].lower():
+            if key == model_name:
                 self.model = model_class(model_info)
                 break
 

@@ -72,7 +72,7 @@ class NLLBTranslationModel(TranslationModel):
                     **generate_kwargs,
                 )
 
-            # 디코딩
+            # 결과 처리
             translated_text = self.tokenizer.decode(
                 outputs[0], skip_special_tokens=True
             )

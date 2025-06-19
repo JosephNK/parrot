@@ -25,6 +25,7 @@ class LoaderModel:
         self.device = self.__get_device()
 
         self.model_name = self.model_info["name"]
+        self.tokenizer_name = self.model_info["tokenizer"]
         self.transformer = self.model_info["transformer"]
 
         # 인증이 필요한 경우 로그인
@@ -37,9 +38,12 @@ class LoaderModel:
         if self.transformer == "seq2seqlm":
             # Seq2SeqLM
             self.__load_model_seq2seqlm(**kwargs)
-        else:
+        elif self.transformer == "causallm":
             # CausalLM
             self.__load_model_causallm(**kwargs)
+        elif self.transformer == "ctranslate2":
+            # ctranslate2
+            self.__load_model_ctranslate2(**kwargs)
 
     def __load_model_seq2seqlm(self, **kwargs) -> None:
         """Seq2SeqLM 모델 로드"""
@@ -50,7 +54,7 @@ class LoaderModel:
             from transformers import AutoModelForSeq2SeqLM
 
             # 토크나이저 로드
-            self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+            self.tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_name)
             print("✓ Tokenizer loaded")
 
             # 모델 로드
@@ -83,7 +87,7 @@ class LoaderModel:
             from transformers import AutoModelForCausalLM
 
             # 토크나이저 로드
-            self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+            self.tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_name)
             print("✓ Tokenizer loaded")
 
             # CausalLM 모델 로드
@@ -99,6 +103,40 @@ class LoaderModel:
             # 디바이스로 이동
             if self.device != "cpu":
                 self.model = self.model.to(self.device)
+
+            print("✓ Model loaded successfully.")
+
+        except Exception as e:
+            print(f"✗ Error loading model: {e}")
+            raise
+
+    def __load_model_ctranslate2(self, **kwargs) -> None:
+        """Ctranslate2 모델 로드"""
+        print(f"Loading model (ctranslate2): {self.model_name}")
+        DEVICE_MAPPING = {
+            "cuda": {"device": "cuda", "compute_type": "int8_float16"},
+            "cpu": {"device": "cpu", "compute_type": "int8"},
+            "mps": {"device": "cpu", "compute_type": "int8"},  # MPS 폴백
+        }
+        config = DEVICE_MAPPING.get(
+            self.device, {"device": "cpu", "compute_type": "int8"}
+        )
+        self.device = config["device"]
+        print(f"Using device: {self.device}")
+
+        try:
+            from hf_hub_ctranslate2 import MultiLingualTranslatorCT2fromHfHub
+
+            # 토크나이저 로드
+            self.tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_name)
+            print("✓ Tokenizer loaded")
+
+            self.model = MultiLingualTranslatorCT2fromHfHub(
+                model_name_or_path=self.model_name,
+                device=config["device"],
+                compute_type=config["compute_type"],
+                tokenizer=self.tokenizer,
+            )
 
             print("✓ Model loaded successfully.")
 

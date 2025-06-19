@@ -104,7 +104,7 @@ Output {self.target_code} translation only.
                     **generate_kwargs,
                 )
 
-            # 디코딩 (입력 부분 제거)
+            # 결과 처리
             generated_tokens = outputs[0][len(inputs["input_ids"][0]) :]
             translated_text = self.tokenizer.decode(
                 generated_tokens, skip_special_tokens=True

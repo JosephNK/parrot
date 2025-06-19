@@ -45,6 +45,8 @@ faiss-cpu = [
     {version = "^1.11.0", markers = "platform_machine != 'i386' and platform_machine != 'i686' and platform_machine != 'x86_64'"}
 ]
 sentence-transformers = "^4.1.0"
+hf-hub-ctranslate2 = ">=1.0.3"
+ctranslate2 = ">=3.13.0"
 
 [tool.poetry.group.dev.dependencies]
 poethepoet = "^0.35.0"

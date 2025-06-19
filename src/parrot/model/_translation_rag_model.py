@@ -30,6 +30,7 @@ class TranslationRagModel:
         self.faiss_index = None
         self.term_embeddings = []
         self.term_pairs = []
+        print("✓ RAG init successfully.")
 
     def load_terminology_db(self) -> None:
         # 용어 매핑 정의

@@ -52,7 +52,7 @@ class M2MTranslationModel(TranslationModel):
                 ),
             )
 
-            # NLLB 모델은 src_lang을 토크나이저 속성으로 설정
+            # M2M 모델은 src_lang을 토크나이저 속성으로 설정
             self.tokenizer.src_lang = self.source_code
             inputs = self.tokenizer(text, return_tensors="pt")
 
@@ -70,7 +70,7 @@ class M2MTranslationModel(TranslationModel):
                     **generate_kwargs,
                 )
 
-            # 디코딩
+            # 결과 처리
             translated_text = self.tokenizer.decode(
                 outputs[0], skip_special_tokens=True
             )
