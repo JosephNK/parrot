@@ -26,11 +26,11 @@ class TranslationRagModel:
         self.embedding_model = SentenceTransformer(
             "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
         )
+        print("✓ Embedding Model loaded successfully.")
         self.terminology_db = {}
         self.faiss_index = None
         self.term_embeddings = []
         self.term_pairs = []
-        print("✓ RAG init successfully.")
 
     def load_terminology_db(self) -> None:
         # 용어 매핑 정의
