@@ -43,6 +43,8 @@ class KoreanJapaneseTranslator:
         model_name: Optional[str] = None,
         auto_load: bool = True,
     ) -> None:
+        self.model_name = model_name
+
         if model_name is None:
             model_info = config.SUPPORTED_MODELS["nllb-200"]
         elif model_name in config.SUPPORTED_MODELS:
@@ -65,15 +67,6 @@ class KoreanJapaneseTranslator:
 
         if auto_load:
             self.model.load_model()
-
-    # def unload_model(self) -> None:
-    #     """현재 로드된 모델 언로드"""
-    #     if hasattr(self, "model") and self.model is not None:
-    #         self.model.unload_model()
-    #         del self.model
-    #         print("모델이 성공적으로 언로드되었습니다.")
-    #     else:
-    #         print("현재 로드된 모델이 없습니다.")
 
     def ko2ja(self, text: str, **kwargs) -> str:
         """

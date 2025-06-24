@@ -21,13 +21,34 @@ https://huggingface.co/docs/hub/security-tokens
 ```
 .env
 
-HUGGINGFACE_HUB_TOKEN=value
+HUGGINGFACE_HUB_TOKEN=your_token_here
 ```
 
 ### Install
 
+poetry Installation
+
 ```bash
 poetry install
+```
+
+Additional Package Installation
+
+```bash
+brew install jq
+brew install redis
+```
+
+Redis Service Start
+
+```bash
+redis-server
+```
+
+Redis Data Clean
+
+```bash
+redis-cli FLUSHALL 
 ```
 
 ### Download Model
@@ -202,6 +223,7 @@ m2m-100-1.2b (ja2ko): Load 8.29s, Translate 0.65s
 ### API
 
 ```bash
+poetry shell
 poe dev - 개발 서버 (자동 재시작)
 poe start - 일반 서버
 poe prod - 프로덕션 서버 (멀티 워커)
@@ -216,9 +238,12 @@ poe prod - 프로덕션 서버 (멀티 워커)
 
 Request:
 ```bash
-curl -G "http://localhost:8000/translate/ko2ja" \
-  --data-urlencode "text=안녕하세요. 오늘 날씨가 정말 좋네요" \
-  --data-urlencode "model=m2m-100-1.2b" | jq
+curl -X POST "http://localhost:8000/translate/ko2ja" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "안녕하세요. 오늘 날씨가 정말 좋네요", 
+    "model": "m2m-100-1.2b"
+  }' | jq
 ```
 
 Response:
@@ -232,9 +257,12 @@ Response:
 
 Request:
 ```bash
-curl -G "http://localhost:8000/translate/ko2ja" \
-  --data-urlencode "text=재이미샵 포카 굿즈 일괄 원가 양도 판매합니다."\
-  --data-urlencode "model=m2m-100-1.2b" | jq
+curl -X POST "http://localhost:8000/translate/ko2ja" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "재이미샵 포카칩 굿즈 일괄 원가 양도 판매합니다.", 
+    "model": "m2m-100-1.2b"
+  }' | jq
 ```
 
 Response:
@@ -253,9 +281,12 @@ Response:
 
 Request:
 ```bash
-curl -G "http://localhost:8000/translate/ko2ja" \
-  --data-urlencode "text=안녕하세요. 오늘 날씨 가 정말 좋네요" \
-  --data-urlencode "model=hyperclova-1.5b" | jq
+curl -X POST "http://localhost:8000/translate/ko2ja" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "안녕하세요. 오늘 날씨가 정말 좋네요", 
+    "model": "hyperclova-1.5b"
+  }' | jq
 ```
 
 Response:
@@ -269,9 +300,12 @@ Response:
 
 Request:
 ```bash
-curl -G "http://localhost:8000/translate/ko2ja" \
-  --data-urlencode "text=재이미샵 포카 굿즈 일괄 원가 양도 판매합니다."\
-  --data-urlencode "model=hyperclova-1.5b" | jq
+curl -X POST "http://localhost:8000/translate/ko2ja" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "재이미샵 포카 굿즈 일괄 원가 양도 판매합니다.", 
+    "model": "hyperclova-1.5b"
+  }' | jq
 ```
 
 Response:

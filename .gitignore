@@ -296,3 +296,5 @@ playground/
 stats/
 analytics/
 reports/
+
+*.rdb

@@ -3,6 +3,7 @@ Translation RAG Model Module
 
 """
 
+import re
 import numpy as np
 from typing import List, Optional, Tuple
 from sentence_transformers import SentenceTransformer
@@ -151,11 +152,12 @@ class TranslationRagModel:
         # 원문에서 특수 용어를 일반적인 단어로 교체
         preprocessed_text = text
         for source_term, target_term, _, _ in retrieved_terms:
-            if source_term in preprocessed_text:
-                # 임시로 일반적인 단어로 교체 (번역이 잘 되도록)
-                preprocessed_text = preprocessed_text.replace(
-                    source_term, f"{target_term}"
-                )
+            # 단어 경계 패턴: 한글은 특별 처리 필요
+            # 앞뒤로 한글, 영문, 숫자가 오지 않는 경우에만 매칭
+            pattern = (
+                rf"(?<![가-힣a-zA-Z0-9]){re.escape(source_term)}(?![가-힣a-zA-Z0-9])"
+            )
+            preprocessed_text = re.sub(pattern, target_term, preprocessed_text)
         return preprocessed_text
 
     def retrieve_text_with_domain(

@@ -47,6 +47,8 @@ faiss-cpu = [
 sentence-transformers = "^4.1.0"
 hf-hub-ctranslate2 = ">=1.0.3"
 ctranslate2 = ">=3.13.0"
+pydantic = "^2.11.7"
+pydantic-settings = "^2.10.0"
 
 [tool.poetry.group.dev.dependencies]
 poethepoet = "^0.35.0"
