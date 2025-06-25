@@ -66,18 +66,8 @@ class SeamlessM4tTranslationModel(TranslationModel):
                 )
 
             # 결과 처리
-            if hasattr(outputs, "sequences"):
-                # GenerateEncoderDecoderOutput의 경우
-                token_ids = outputs.sequences[0]
-            else:
-                # 직접 텐서인 경우
-                token_ids = outputs[0]
-            if hasattr(token_ids, "tolist"):
-                # 텐서를 리스트로 변환 (필요한 경우)
-                token_ids = token_ids.tolist()
-
             translated_text = self.tokenizer.decode(
-                token_ids,
+                outputs[0].tolist()[0],
                 skip_special_tokens=True,
             )
 

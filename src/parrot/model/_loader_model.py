@@ -1,7 +1,6 @@
 import os
 import torch
-from typing import Optional, Dict, Any
-from transformers import AutoTokenizer
+from typing import Optional, Dict
 from huggingface_hub import login
 from ..config import config
 
@@ -54,7 +53,7 @@ class LoaderModel:
         print(f"Using device: {self.device}")
 
         try:
-            from transformers import AutoModelForSeq2SeqLM
+            from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
             # 토크나이저 로드
             self.tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_name)
@@ -87,7 +86,7 @@ class LoaderModel:
         print(f"Using device: {self.device}")
 
         try:
-            from transformers import AutoModelForCausalLM
+            from transformers import AutoTokenizer, AutoModelForCausalLM
 
             # 토크나이저 로드
             self.tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_name)
@@ -128,7 +127,10 @@ class LoaderModel:
         print(f"Using device: {self.device}")
 
         try:
-            from hf_hub_ctranslate2 import MultiLingualTranslatorCT2fromHfHub
+            from hf_hub_ctranslate2 import (
+                AutoTokenizer,
+                MultiLingualTranslatorCT2fromHfHub,
+            )
 
             # 토크나이저 로드
             self.tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_name)
@@ -153,10 +155,10 @@ class LoaderModel:
         print(f"Using device: {self.device}")
 
         try:
-            from transformers import SeamlessM4Tv2Model
+            from transformers import AutoProcessor, SeamlessM4Tv2Model
 
             # 토크나이저 로드
-            self.tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_name)
+            self.tokenizer = AutoProcessor.from_pretrained(self.tokenizer_name)
             print("✓ Tokenizer loaded")
 
             # 모델 로드
