@@ -15,6 +15,7 @@ from .model import (
     NLLBTranslationModel,
     QwenTranslationModel,
     VarcoTranslationModel,
+    SeamlessM4tTranslationModel,
 )
 from .config import config
 
@@ -58,6 +59,7 @@ class KoreanJapaneseTranslator:
             "hyperclova-1.5b": HyperCLOVAXTranslationModel,
             "qwen2.5-1.5b": QwenTranslationModel,
             "varco-8b": VarcoTranslationModel,
+            "seamless-m4t-v2-large": SeamlessM4tTranslationModel,
         }
 
         for key, model_class in model_mapping.items():

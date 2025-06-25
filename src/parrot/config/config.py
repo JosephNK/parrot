@@ -94,6 +94,11 @@ class Config(BaseSettings):
                 "tokenizer": "Qwen/Qwen2.5-1.5B-Instruct",
                 "transformer": "causallm",
             },
+            "seamless-m4t-v2-large": {
+                "name": "facebook/seamless-m4t-v2-large",
+                "tokenizer": "facebook/seamless-m4t-v2-large",
+                "transformer": "seamlessM4Tv2",
+            },
             "hyperclova-1.5b": {
                 "name": "naver-hyperclovax/HyperCLOVAX-SEED-Text-Instruct-1.5B",
                 "tokenizer": "naver-hyperclovax/HyperCLOVAX-SEED-Text-Instruct-1.5B",

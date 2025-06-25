@@ -44,6 +44,9 @@ class LoaderModel:
         elif self.transformer == "ctranslate2":
             # ctranslate2
             self.__load_model_ctranslate2(**kwargs)
+        elif self.transformer == "seamlessM4Tv2":
+            # seamlessM4Tv2
+            self.__load_model_seamlessM4Tv2(**kwargs)
 
     def __load_model_seq2seqlm(self, **kwargs) -> None:
         """Seq2SeqLM 모델 로드"""
@@ -136,6 +139,29 @@ class LoaderModel:
                 device=config["device"],
                 compute_type=config["compute_type"],
                 tokenizer=self.tokenizer,
+            )
+
+            print("✓ Model loaded successfully.")
+
+        except Exception as e:
+            print(f"✗ Error loading model: {e}")
+            raise
+
+    def __load_model_seamlessM4Tv2(self, **kwargs) -> None:
+        """SeamlessM4Tv2 모델 로드"""
+        print(f"Loading model (seamlessM4Tv2): {self.model_name}")
+        print(f"Using device: {self.device}")
+
+        try:
+            from transformers import SeamlessM4Tv2Model
+
+            # 토크나이저 로드
+            self.tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_name)
+            print("✓ Tokenizer loaded")
+
+            # 모델 로드
+            self.model = SeamlessM4Tv2Model.from_pretrained(
+                self.model_name,
             )
 
             print("✓ Model loaded successfully.")

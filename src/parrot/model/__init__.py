@@ -8,6 +8,7 @@ from .mbart_translation_model import MBartTranslationModel
 from .nllb_translation_model import NLLBTranslationModel
 from .qwen_translation_model import QwenTranslationModel
 from .varco_translation_model import VarcoTranslationModel
+from .seamless_m4t_translation_model import SeamlessM4tTranslationModel
 
 __all__ = [
     "LoaderModel",
@@ -20,4 +21,5 @@ __all__ = [
     "NLLBTranslationModel",
     "QwenTranslationModel",
     "VarcoTranslationModel",
+    "SeamlessM4tTranslationModel",
 ]
