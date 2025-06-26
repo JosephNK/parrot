@@ -235,9 +235,8 @@ poe prod - 프로덕션 서버 (멀티 워커)
 ### Testing
 
 #### Environment Information
-- **Hardware**: Macbook M3
+- **Hardware**: Macbook M2
 - **Model**: m2m-100-1.2b
-- **Description**: `Text2Text Generation` A task that takes input text and transforms it into a different form of text.
 
 Request:
 ```bash
@@ -263,7 +262,7 @@ Request:
 curl -X POST "http://localhost:8000/translate/ko2ja" \
   -H "Content-Type: application/json" \
   -d '{
-    "text": "재이미샵 포카칩 굿즈 일괄 원가 양도 판매합니다.", 
+    "text": "재이미샵 포카 굿즈 일괄 원가 양도 판매합니다.", 
     "model": "m2m-100-1.2b"
   }' | jq
 ```
@@ -278,9 +277,8 @@ Response:
 ```
 
 #### Environment Information
-- **Hardware**: Macbook M3
+- **Hardware**: Macbook M2
 - **Model**: hyperclova-1.5b
-- **Description**: `Safetensors` A new file format for storing machine learning model weights.
 
 Request:
 ```bash
